@@ -3,7 +3,7 @@ import { axiosApi } from "../Axios.api";
 export const createBillTemplateApi = async (url, payload) => {
   try {
     const userResponse = await axiosApi.post(url, payload);
-    return userResponse;
+    return userResponse?.data;
   } catch (error) {
     throw error;
   }
@@ -12,7 +12,7 @@ export const createBillTemplateApi = async (url, payload) => {
 export const updateBillTemplateApi = async (url, payload) => {
   try {
     const userResponse = await axiosApi.post(url, payload);
-    return userResponse;
+    return userResponse?.data;
   } catch (error) {
     throw error;
   }
@@ -21,7 +21,7 @@ export const updateBillTemplateApi = async (url, payload) => {
 export const getBillTemplateApi = async (url) => {
   try {
     const userResponse = await axiosApi.get(url);
-    return userResponse;
+    return userResponse?.data;
   } catch (error) {
     throw error;
   }

@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import axios from "axios";
 import { Chart, registerables } from "chart.js";
 import { QueryClient, QueryClientProvider } from "react-query";
-import { ReactQueryDevtools } from "react-query/devtools";
+
 // Apps
 import { MetronicI18nProvider } from "./_metronic/i18n/Metronici18n";
 import "./_metronic/assets/fonticon/fonticon.css";
@@ -21,17 +21,7 @@ import "./_metronic/assets/sass/style.react.scss";
 import "react-toastify/dist/ReactToastify.css";
 import { AppRoutes } from "./app/routing/AppRoutes";
 import { AuthProvider, setupAxios } from "./app/modules/auth";
-/**
- * Creates `axios-mock-adapter` instance for provided `axios` instance, add
- * basic Metronic mocks and returns it.
- *
- * @see https://github.com/ctimmerm/axios-mock-adapter
- */
-/**
- * Inject Metronic interceptors for axios.
- *
- * @see https://github.com/axios/axios#interceptors
- */
+
 setupAxios(axios);
 Chart.register(...registerables);
 
@@ -45,7 +35,6 @@ if (container) {
           <AppRoutes />
         </AuthProvider>
       </MetronicI18nProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 }
