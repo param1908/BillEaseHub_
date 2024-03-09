@@ -13,6 +13,7 @@ import {
 import { PageDataProvider } from "./core";
 import { reInitMenu } from "../helpers";
 import { ToolbarWrapper } from "./components/toolbar";
+import { Sidebar } from "../../app/modules/auth/components/sidebar";
 
 const MasterLayout = () => {
   const location = useLocation();
@@ -32,6 +33,7 @@ const MasterLayout = () => {
             className="app-wrapper flex-column flex-row-fluid"
             id="kt_app_wrapper"
           >
+            <Sidebar />
             <div
               className="app-main flex-column flex-row-fluid"
               id="kt_app_main"
