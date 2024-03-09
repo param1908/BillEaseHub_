@@ -1,10 +1,11 @@
-import {Suspense} from 'react'
-import {Outlet} from 'react-router-dom'
-import {I18nProvider} from '../_metronic/i18n/i18nProvider'
-import {LayoutProvider, LayoutSplashScreen} from '../_metronic/layout/core'
-import {MasterInit} from '../_metronic/layout/MasterInit'
-import {AuthInit} from './modules/auth'
-import {ThemeModeProvider} from '../_metronic/partials'
+import { Suspense } from "react";
+import { Outlet } from "react-router-dom";
+import { I18nProvider } from "../_metronic/i18n/i18nProvider";
+import { LayoutProvider, LayoutSplashScreen } from "../_metronic/layout/core";
+import { MasterInit } from "../_metronic/layout/MasterInit";
+import { AuthInit } from "./modules/auth";
+import { ThemeModeProvider } from "../_metronic/partials";
+import { ToastContainer } from "react-toastify";
 
 const App = () => {
   return (
@@ -13,6 +14,18 @@ const App = () => {
         <LayoutProvider>
           <ThemeModeProvider>
             <AuthInit>
+              <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={true}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="colored"
+              />
               <Outlet />
               <MasterInit />
             </AuthInit>
@@ -20,7 +33,7 @@ const App = () => {
         </LayoutProvider>
       </I18nProvider>
     </Suspense>
-  )
-}
+  );
+};
 
-export {App}
+export { App };
