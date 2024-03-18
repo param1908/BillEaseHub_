@@ -71,6 +71,7 @@ const MasterLayout = () => {
                   </div>
                 </div>
               </div>
+              {/* <FooterWrapper /> */}
             </div>
           </div>
 
