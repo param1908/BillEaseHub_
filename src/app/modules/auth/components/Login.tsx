@@ -10,6 +10,9 @@ import { login } from "../../../services/auth.service";
 import { toast } from "react-toastify";
 import { UserRoles } from "../constants";
 import { setAuthHeader } from "../../../../Axios.api";
+import { getUserDetailsByToken } from "../../../services/common.service";
+import { useDispatch } from "react-redux";
+import { storeUserDetails } from "../../../store/slice/user.slice";
 
 const loginSchema = Yup.object().shape({
   email: Yup.string()
@@ -36,6 +39,7 @@ const initialValues = {
 
 export function Login() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const { saveAuth, setCurrentUser } = useAuth();
   const { customer, merchant, admin } = UserRoles;
@@ -60,12 +64,13 @@ export function Login() {
           localStorage.setItem("_token", `${token}`);
           localStorage.setItem("role", userResponse?.data?.user?.role);
           setAuthHeader(`Bearer ${token}`);
-          setCurrentUser(userResponse?.data?.user);
+          const userDetailsResponse = await getUserDetailsByToken();
+          dispatch(storeUserDetails(userDetailsResponse?.data));
 
           if (userResponse?.data?.user?.role == customer)
-            navigate("/dashboard");
+            navigate("/customer/dashboard");
           if (userResponse?.data?.user?.role == merchant)
-            navigate("/dashboard");
+            navigate("/merchant/dashboard");
         }
       } catch (error) {
         saveAuth(undefined);

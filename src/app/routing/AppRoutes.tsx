@@ -11,6 +11,9 @@ import { PrivateRoutes } from "./PrivateRoutes";
 import { ErrorsPage } from "../modules/errors/ErrorsPage";
 import { Logout, AuthPage, useAuth } from "../modules/auth";
 import { App } from "../App";
+import { routeList } from "./RouteList";
+import { ProtectedRoute } from "./protectedRoute";
+import MainLayout from "../mainLayout/MainLayout";
 
 /**
  * Base URL of the website.
@@ -27,10 +30,12 @@ const AppRoutes: FC = () => {
         <Route element={<App />}>
           <Route path="error/*" element={<ErrorsPage />} />
           <Route path="logout" element={<Logout />} />
+          <Route path="/*" element={<PrivateRoutes />} />
+
           {currentUser ? (
             <>
-            <Route index element={<Navigate to="/dashboard" />} />
-            <Route path="/*" element={<PrivateRoutes />} />
+              <Route index element={<Navigate to="/dashboard" />} />
+              <Route path="/*" element={<PrivateRoutes />} />
             </>
           ) : (
             <>

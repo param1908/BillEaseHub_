@@ -21,6 +21,8 @@ import "./_metronic/assets/sass/style.react.scss";
 import "react-toastify/dist/ReactToastify.css";
 import { AppRoutes } from "./app/routing/AppRoutes";
 import { AuthProvider, setupAxios } from "./app/modules/auth";
+import { Provider } from "react-redux";
+import { store } from "./app/store/config.store";
 
 setupAxios(axios);
 Chart.register(...registerables);
@@ -29,12 +31,14 @@ const queryClient = new QueryClient();
 const container = document.getElementById("root");
 if (container) {
   createRoot(container).render(
-    <QueryClientProvider client={queryClient}>
-      <MetronicI18nProvider>
-        <AuthProvider>
-          <AppRoutes />
-        </AuthProvider>
-      </MetronicI18nProvider>
-    </QueryClientProvider>
+    <Provider store={store}>
+      <QueryClientProvider client={queryClient}>
+        <MetronicI18nProvider>
+          <AuthProvider>
+            <AppRoutes />
+          </AuthProvider>
+        </MetronicI18nProvider>
+      </QueryClientProvider>
+    </Provider>
   );
 }
