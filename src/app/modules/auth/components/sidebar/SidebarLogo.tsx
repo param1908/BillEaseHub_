@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import clsx from "clsx";
 import { MutableRefObject, useEffect, useRef } from "react";
-import { useLayout } from "../../../../../_metronic/layout/core";
+import { useLayout } from "../../../../layout/core";
 import { ToggleComponent } from "../../../../../_metronic/assets/ts/components";
 import { KTIcon, toAbsoluteUrl } from "../../../../../_metronic/helpers";
 

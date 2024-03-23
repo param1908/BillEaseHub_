@@ -23,7 +23,6 @@ import MainLayout from "../mainLayout/MainLayout";
 const { PUBLIC_URL } = process.env;
 
 const AppRoutes: FC = () => {
-  const { currentUser } = useAuth();
   return (
     <BrowserRouter basename={PUBLIC_URL}>
       <Routes>
@@ -31,18 +30,7 @@ const AppRoutes: FC = () => {
           <Route path="error/*" element={<ErrorsPage />} />
           <Route path="logout" element={<Logout />} />
           <Route path="/*" element={<PrivateRoutes />} />
-
-          {currentUser ? (
-            <>
-              <Route index element={<Navigate to="/dashboard" />} />
-              <Route path="/*" element={<PrivateRoutes />} />
-            </>
-          ) : (
-            <>
-              <Route path="auth/*" element={<AuthPage />} />
-              <Route path="*" element={<Navigate to="/auth" />} />
-            </>
-          )}
+          <Route path="auth/*" element={<AuthPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

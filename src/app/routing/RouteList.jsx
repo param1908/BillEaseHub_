@@ -1,7 +1,7 @@
 import React from "react";
 import { LayoutTypes, UserRoles } from "../modules/auth/constants";
 import { Login } from "../modules/auth/components/Login";
-import { DashboardWrapper } from "../pages/dashboard/DashboardWrapper";
+import { DashboardWrapper } from "../pages/customer/dashboard/DashboardWrapper";
 import { MDashboardWrapper } from "../pages/merchant/dashboard/MDashboardWrapper";
 const { customer, merchant, admin } = UserRoles;
 const { BEFORE_AUTH, AFTER_AUTH, DEFAULT } = LayoutTypes;
@@ -21,7 +21,7 @@ export const routeList = [
   {
     id: "CUST_01",
     icon: "",
-    path: "/login",
+    path: "/auth/login",
     name: "Sign In",
     element: <Login />,
     layoutType: BEFORE_AUTH,

@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import { SidebarMenu } from "./sidebar-menu/SidebarMenu";
 import { SidebarFooter } from "./SidebarFooter";
 import { SidebarLogo } from "./SidebarLogo";
-import { useLayout } from "../../../../../_metronic/layout/core";
+import { useLayout } from "../../../../layout/core";
 import { ILayout } from "../../_Models";
 
 const Sidebar = () => {

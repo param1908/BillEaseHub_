@@ -7,7 +7,7 @@ import {
   WithChildren,
   checkIsActive,
 } from "../../../../../../_metronic/helpers";
-import { useLayout } from "../../../../../../_metronic/layout/core";
+import { useLayout } from "../../../../../layout/core";
 
 type Props = {
   to: string;

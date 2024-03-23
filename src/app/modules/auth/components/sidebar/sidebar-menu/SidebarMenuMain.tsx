@@ -4,18 +4,27 @@ import { useIntl } from "react-intl";
 import { SidebarMenuItemWithSub } from "./SidebarMenuItemWithSub";
 import { SidebarMenuItem } from "./SidebarMenuItem";
 import { KTIcon } from "../../../../../../_metronic/helpers";
+import { useSelector } from "react-redux";
+import { customerItems, merchantItems } from "./sidebarMenuItems";
 
 const SidebarMenuMain = () => {
   const intl = useIntl();
+  const { userDetails } = useSelector((state: any) => state.user);
+  console.log("userDetailsvvvvvvvvvvvv", userDetails);
+  const Items = userDetails?.user?.role === "C" ? customerItems : merchantItems;
 
   return (
     <>
-      <SidebarMenuItem
-        to="/dashboard"
-        icon="element-11"
-        title={intl.formatMessage({ id: "MENU.DASHBOARD" })}
-        fontIcon="bi-app-indicator"
-      />
+      {Items.map((item) => {
+        return (
+          <SidebarMenuItem
+            to={item?.to}
+            icon={item?.icon}
+            title={item?.name}
+            fontIcon="bi-app-indicator"
+          />
+        );
+      })}
     </>
   );
 };
