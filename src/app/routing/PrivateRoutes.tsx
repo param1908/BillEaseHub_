@@ -92,7 +92,7 @@ const PrivateRoutes = () => {
             />
           );
         })}
-        <Route path="*" element={<Navigate to="/login" />} />
+        <Route path="*" element={<Navigate to="/auth/login" />} />
       </Route>
     </Routes>
   );
