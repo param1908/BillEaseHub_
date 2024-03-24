@@ -7,7 +7,10 @@ import { toast } from "react-toastify";
 import { setAuthHeader } from "../../../../Axios.api";
 import { KTIcon } from "../../../../_metronic/helpers";
 import { login, registerApi } from "../../../services/auth.service";
-import { getUserDetailsByToken } from "../../../services/common.service";
+import {
+  allowNumber,
+  getUserDetailsByToken,
+} from "../../../services/common.service";
 import { storeUserDetails } from "../../../store/slice/user.slice";
 import { useDispatch } from "react-redux";
 
@@ -85,7 +88,7 @@ export function Registration() {
       try {
         console.log(values);
         const { confirmPassword, ...formData } = values;
-        const response = await registerApi({...formData, role: accountType});
+        const response = await registerApi({ ...formData, role: accountType });
         if (response.success) {
           toast.success(response?.message);
           navigate("/auth/login");
@@ -111,6 +114,9 @@ export function Registration() {
           type={type}
           name={name}
           autoComplete="off"
+          onKeyPress={(event) => {
+            allowNumber(event, label);
+          }}
         />
         {formik.touched[name] && formik.errors[name] && (
           <div className="fv-plugins-message-container">
@@ -243,7 +249,9 @@ export function Registration() {
           >
             {/* begin::Heading */}
             <div className="text-center mb-11">
-              <h1 className="text-dark fw-bolder mb-3">Sign Up</h1>
+              <h1 className="text-dark fw-bolder mb-3">
+                {accountType === "M" ? "Merchant" : "Customer"} Sign Up
+              </h1>
             </div>
             {/* begin::Heading */}
 
@@ -287,7 +295,10 @@ export function Registration() {
             {/* end::Action */}
 
             <div className="text-gray-500 text-center fw-semibold fs-6">
-              Not a Member yet? <a className="link-primary">Sign in</a>
+              Already have an account?{" "}
+              <Link to="/auth/login" className="link-primary">
+                Login
+              </Link>
             </div>
           </form>
         </div>

@@ -1,7 +1,7 @@
 import { axiosApi } from "../../Axios.api";
 
-export const allowNumber = (event) => {
-  if (!/[0-9]/.test(event.key)) {
+export const allowNumber = (event, type) => {
+  if (type === "Phone" && !/[0-9]/.test(event.key)) {
     event.preventDefault();
   }
 };

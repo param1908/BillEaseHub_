@@ -42,7 +42,7 @@ const AuthLayout = () => {
       {/* end::Aside */}
 
       {/* begin::Body */}
-      <div className="d-flex flex-column flex-lg-row-fluid w-lg-50 p-10">
+      <div className="d-flex flex-column flex-lg-row-fluid w-lg-50 p-10 overflow-auto">
         {/* begin::Form */}
         <div className="d-flex flex-center flex-column flex-lg-row-fluid">
           {/* begin::Wrapper */}
