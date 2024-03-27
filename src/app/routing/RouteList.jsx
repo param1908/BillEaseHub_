@@ -3,6 +3,8 @@ import { LayoutTypes, UserRoles } from "../modules/auth/constants";
 import { Login } from "../modules/auth/components/Login";
 import { DashboardWrapper } from "../pages/customer/dashboard/DashboardWrapper";
 import { MDashboardWrapper } from "../pages/merchant/dashboard/MDashboardWrapper";
+import Category from "../pages/merchant/category/Category";
+import Product from "../pages/merchant/product/Product";
 const { customer, merchant, admin } = UserRoles;
 const { BEFORE_AUTH, AFTER_AUTH, DEFAULT } = LayoutTypes;
 
@@ -118,4 +120,24 @@ export const routeList = [
   //     isAuthRequired: true,
   //     accessRoles: [merchant],
   //   },
+  {
+    id: "CUST_10",
+    icon: "",
+    path: "/merchant/category",
+    name: "Category",
+    element: <Category />,
+    layoutType: AFTER_AUTH,
+    isAuthRequired: true,
+    accessRoles: [merchant],
+  },
+  {
+    id: "CUST_11",
+    icon: "",
+    path: "/merchant/product",
+    name: "Product",
+    element: <Product />,
+    layoutType: AFTER_AUTH,
+    isAuthRequired: true,
+    accessRoles: [merchant],
+  },
 ];

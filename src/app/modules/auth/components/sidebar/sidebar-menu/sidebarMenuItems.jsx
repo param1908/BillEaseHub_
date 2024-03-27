@@ -3,5 +3,7 @@ export const customerItems = [
 ];
 
 export const merchantItems = [
-  { name: "Dashboard", to: "/merchant/dashboard", icon: "element-11" },
+  { name: "Dashboard", to: "/merchant/dashboard", icon: "home" },
+  { name: "Category", to: "/merchant/category", icon: "category" },
+  { name: "Products", to: "/merchant/product", icon: "parcel" },
 ];
