@@ -1,28 +1,46 @@
 import clsx from "clsx";
 import { useFormik } from "formik";
-import React, { useState } from "react";
-import { Modal } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Button, Modal } from "react-bootstrap";
 import * as Yup from "yup";
 import Select from "react-select";
+import { toast } from "react-toastify";
 import product1 from "../../../../_metronic/assets/images/products/1.png";
 import blackImage from "../../../../_metronic/assets/images/svg/files/blank-image.svg";
 import { KTIcon } from "../../../../_metronic/helpers";
+import {
+  addCategoryApi,
+  deleteCategoryApi,
+  getAllCategoriesApi,
+  updateCategoryApi,
+} from "../../../services/merchant.service";
+import SweetAlert from "react-bootstrap-sweetalert";
 
 const Category = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState();
+  const [isEdit, setIsEdit] = useState(false);
+  const [paginate, setPaginate] = useState({ limit: 12, page: 1 });
+  const [editableImage, setEditableImage] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
+  const [tempId, setTempId] = useState("");
+
+  const [categories, setCategories] = useState([]);
+
+  const [total, setTotal] = useState(0);
 
   const options = [
-    { value: "chocolate", label: "Chocolate" },
-    { value: "strawberry", label: "Strawberry" },
-    { value: "vanilla", label: "Vanilla" },
+    { value: "Active", label: "Active" },
+    { value: "Inactive", label: "In Active" },
   ];
 
   const handleOpenModal = () => {
     setShowModal(true);
     formik.resetForm();
     setSelectedImage(null);
+    setEditableImage("");
   };
 
   const handleClose = () => {
@@ -30,11 +48,14 @@ const Category = () => {
   };
 
   const handleImageChange = (event) => {
+    console.log("file", event);
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        setSelectedImage(e.target.result); // Set selected image when it's loaded
+        const base64String = reader.result;
+        console.log("baswe", base64String);
+        setSelectedImage(base64String); // Set selected image when it's loaded
       };
       reader.readAsDataURL(file);
     }
@@ -42,16 +63,19 @@ const Category = () => {
 
   const categorySchema = Yup.object().shape({
     name: Yup.string().required("Category name is required"),
-    image: Yup.string().url("Image must be a valid URL"),
+    image: !isEdit
+      ? Yup.string().required("Profile image is required")
+      : Yup.string(),
     description: Yup.string().required("Description is required"),
-    status: Yup.string().required("Status is required"),
+    status: Yup.object().required("Status is required"),
   });
 
   const initialValues = {
     name: "",
     image: "",
     description: "",
-    status: "",
+    status: null,
+    categoryId: "",
   };
 
   const formik = useFormik({
@@ -60,7 +84,32 @@ const Category = () => {
     onSubmit: async (values, { setSubmitting }) => {
       setLoading(true);
       try {
-        console.log(values);
+        let response;
+        if (isEdit) {
+          const payload = {
+            categoryId: values?.categoryId,
+          };
+          if (values?.name) payload.name = values?.name;
+          if (values?.description) payload.description = values?.description;
+          if (values?.status) payload.status = values?.status?.value;
+          if (selectedImage) payload.image = selectedImage;
+          response = await updateCategoryApi(payload);
+        } else {
+          const payload = {
+            name: values?.name,
+            description: values?.description,
+            status: values?.status?.value,
+            image: selectedImage,
+          };
+          response = await addCategoryApi(payload);
+        }
+        console.log(values, selectedImage);
+
+        if (response["ResponseCode"] == 1) {
+          toast.success(response?.message);
+          setShowModal(false);
+          getAllCategories();
+        }
       } catch (error) {
         setSubmitting(false);
         setLoading(false);
@@ -68,12 +117,60 @@ const Category = () => {
     },
   });
 
+  useEffect(() => {
+    getAllCategories();
+  }, [search]);
+
+  const getAllCategories = async () => {
+    try {
+      const payload = {
+        ...paginate,
+      };
+      if (search) payload.search = search;
+      const categoryData = await getAllCategoriesApi(payload);
+      setCategories(categoryData?.data?.categoryDetails);
+      setTotal(categoryData?.data?.total);
+    } catch (error) {
+      console.log("err", error);
+    }
+  };
+
+  const handleEdit = (el) => {
+    setIsEdit(true);
+    setSelectedImage(null);
+    console.log("el", el);
+    setShowModal(true);
+    formik.setValues({
+      name: el?.name,
+      description: el?.description,
+      status:
+        el?.status === "Active"
+          ? { value: "Active", label: "Active" }
+          : { value: "Inactive", label: "In Active" },
+      categoryId: el?._id,
+    });
+    setEditableImage(el?.categoryImgUrl + el?.image);
+    console.log("formic", formik.values);
+  };
+
+  const deleteCategory = async () => {
+    console.log("first", tempId);
+    if (tempId) {
+      let response = await deleteCategoryApi(tempId);
+      if (response["ResponseCode"] == 1) {
+        toast.success(response?.message);
+        await getAllCategories();
+        setShowAlert(false);
+      }
+    }
+  };
+
   return (
     <>
       <div className="card card-custom card-stretch gutter-b mb-10">
         <div className="card-header">
           <div class="card-title m-0 d-flex justify-content-between w-100">
-            <h3 class="fw-bolder m-0">ALL Categories [ ]</h3>
+            <h3 class="fw-bolder m-0">ALL Categories [ {total} ]</h3>
             <div className="d-flex">
               <div class="d-flex align-items-center position-relative my-1 me-md-2">
                 <i class="ki-duotone ki-magnifier fs-1 position-absolute ms-6">
@@ -85,7 +182,7 @@ const Category = () => {
                   data-kt-user-table-filter="search"
                   class="form-control form-control-solid w-250px ps-14"
                   placeholder="Search Category"
-                  // value=""
+                  onKeyUp={(e) => setSearch(e.target.value)}
                 />
               </div>
               <div
@@ -94,7 +191,10 @@ const Category = () => {
                 data-bs-placement="top"
                 data-bs-trigger="hover"
                 title="Click to add a user"
-                onClick={() => handleOpenModal()}
+                onClick={() => {
+                  handleOpenModal();
+                  setIsEdit(false);
+                }}
               >
                 <a href="#" class="btn btn-sm btn-light-primary py-4">
                   <i class="ki-duotone ki-plus fs-3"></i>Add Category
@@ -105,43 +205,57 @@ const Category = () => {
         </div>
         <div className="card-body h-auto">
           <div className="row">
-            <div class="col-md-3 col-xxl-3 col-lg-12">
-              <div class="card card-custom card-shadowless">
-                <div class="card-body p-0">
-                  <div class="overlay">
-                    <div class="overlay-wrapper rounded bg-light text-center">
-                      <img src={product1} alt="" class="mw-100 w-200px" />
-                    </div>
-                    <div class="overlay-layer">
-                      <a
-                        href="#"
-                        class="btn btn-light-primary font-weight-bolder py-2 font-size-sm me-2"
-                      >
-                        Edit
-                      </a>
-                      <a
-                        href="#"
-                        class="btn font-weight-bolder btn-sm btn-light-primary"
-                      >
-                        Delete
-                      </a>
-                    </div>
-                  </div>
+            {categories.length &&
+              categories.map((el, index) => {
+                return (
+                  <div class="col-md-3 col-xxl-3 col-lg-12 mb-5" key={index}>
+                    <div class="card card-custom card-shadowless h-100">
+                      <div class="card-body p-0">
+                        <div class="overlay">
+                          <div class="overlay-wrapper rounded bg-light text-center">
+                            <img
+                              src={el.categoryImgUrl + el.image}
+                              alt=""
+                              style={{ width: "200px", height: "150px" }}
+                            />
+                          </div>
+                          <div class="overlay-layer">
+                            <a
+                              class="btn btn-light-primary font-weight-bolder py-2 font-size-sm me-2 cursor-pointer"
+                              onClick={() => handleEdit(el)}
+                            >
+                              Edit
+                            </a>
+                            <a
+                              class="btn font-weight-bolder btn-sm btn-light-primary cursor-pointer"
+                              onClick={() => {
+                                setShowAlert(true);
+                                setTempId(el?._id);
+                              }}
+                            >
+                              Delete
+                            </a>
+                          </div>
+                        </div>
 
-                  <div class="text-center mt-5 mb-md-0 mb-lg-5 mb-md-0 mb-lg-5 mb-lg-0 mb-5 d-flex flex-column">
-                    <a
-                      href="#"
-                      class="font-size-h5 font-weight-bolder text-dark-75 text-hover-primary mb-1"
-                    >
-                      Smart Watches
-                    </a>
-                    <span class="font-size-lg">
-                      Outlines keep poorly thought
-                    </span>
+                        <div class="text-center mt-5 mb-md-0 mb-lg-5 mb-md-0 mb-lg-5 mb-lg-0 mb-5 d-flex flex-column">
+                          <a
+                            href="#"
+                            class="font-size-h5 font-weight-bolder text-dark-75 text-hover-primary mb-1"
+                          >
+                            {el?.name}
+                          </a>
+                          <span class="font-size-lg">
+                            {el.description?.length > 70
+                              ? el.description?.slice(0, 70) + "...."
+                              : el.description}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            </div>
+                );
+              })}
           </div>
         </div>
       </div>
@@ -161,15 +275,13 @@ const Category = () => {
           id="kt_login_signin_form"
         >
           <div className="modal-header justify-content-between">
-            <h2 className="m-0">Add Category</h2>
-            {/* begin::Close */}
+            <h2 className="m-0">{isEdit ? "Edit" : "Add"} Category</h2>
             <div
               className="btn btn-sm btn-icon btn-active-color-primary"
               onClick={handleClose}
             >
               <KTIcon className="fs-1" iconName="cross" iconType="solid" />
             </div>
-            {/* end::Close */}
           </div>
 
           <div className="modal-body py-lg-10 px-lg-10">
@@ -187,7 +299,9 @@ const Category = () => {
                       class="image-input image-input-empty image-input-outline image-input-placeholder mb-3"
                       data-kt-image-input="true"
                       style={{
-                        backgroundImage: `url(${selectedImage || blackImage})`,
+                        backgroundImage: `url(${
+                          selectedImage || editableImage || blackImage
+                        })`,
                       }}
                     >
                       <div class="image-input-wrapper w-150px h-150px"></div>
@@ -209,7 +323,11 @@ const Category = () => {
                           type="file"
                           name="avatar"
                           accept=".png, .jpg, .jpeg"
-                          onChange={(e) => handleImageChange(e)}
+                          onChange={(e) => {
+                            console.log("e", e.target.files[0]);
+                            formik.setFieldValue("image", e.target.files[0]);
+                            handleImageChange(e);
+                          }}
                         />
                         <input type="hidden" name="avatar_remove" />
                       </label>
@@ -247,6 +365,13 @@ const Category = () => {
                       Set the category thumbnail image. Only *.png, *.jpg and
                       *.jpeg image files are accepted
                     </div>
+                    {formik.touched.image && formik.errors.image && (
+                      <div className="fv-plugins-message-container">
+                        <div className="fv-help-block">
+                          <span role="alert">{formik.errors.image}</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -312,9 +437,34 @@ const Category = () => {
                           </div>
                         )}
                     </div>
-                    <Select 
-                    theme={'dark'}
-                    placeholder={"Select Status"} options={options} />
+                    <Select
+                      theme={"dark"}
+                      type="select"
+                      placeholder={"Select Status"}
+                      options={options}
+                      onChange={(option) => {
+                        formik.setFieldValue("status", option);
+                      }}
+                      value={formik.values.status}
+                      className={clsx(
+                        "form-control bg-transparent beh-select",
+                        {
+                          "is-invalid":
+                            formik.touched.status && formik.errors.status,
+                        },
+                        {
+                          "is-valid":
+                            formik.touched.status && !formik.errors.status,
+                        }
+                      )}
+                    />
+                    {formik.touched.status && formik.errors.status && (
+                      <div className="fv-plugins-message-container">
+                        <div className="fv-help-block">
+                          <span role="alert">{formik.errors.status}</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                   <div className="text-end">
                     <button
@@ -327,25 +477,23 @@ const Category = () => {
                       Cancel
                     </button>
 
-                    <button
-                      type="submit"
-                      className="btn btn-primary"
-                      data-kt-users-modal-action="submit"
-                      // disabled={
-                      //   isUserLoading ||
-                      //   formik.isSubmitting ||
-                      //   !formik.isValid ||
-                      //   !formik.touched
-                      // }
-                    >
-                      <span className="indicator-label">Submit</span>
-                      {/* {(formik.isSubmitting || isUserLoading) && (
-                <span className="indicator-progress">
-                  Please wait...{" "}
-                  <span className="spinner-border spinner-border-sm align-middle ms-2"></span>
-                </span>
-              )} */}
-                    </button>
+                    {isEdit ? (
+                      <button
+                        type="submit"
+                        className="btn btn-primary"
+                        data-kt-users-modal-action="submit"
+                      >
+                        <span className="indicator-label">Update</span>
+                      </button>
+                    ) : (
+                      <button
+                        type="submit"
+                        className="btn btn-primary"
+                        data-kt-users-modal-action="submit"
+                      >
+                        <span className="indicator-label">Submit</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -353,6 +501,28 @@ const Category = () => {
           </div>
         </form>
       </Modal>
+      {showAlert && (
+        <SweetAlert
+          warning
+          title="Are you sure you want to delete?"
+          customButtons={
+            <React.Fragment>
+              <Button
+                variant="outlined btn btn-danger"
+                onClick={() => setShowAlert(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="ms-2 btn btn-primary"
+                onClick={() => deleteCategory()}
+              >
+                Confirm
+              </Button>
+            </React.Fragment>
+          }
+        ></SweetAlert>
+      )}
     </>
   );
 };
