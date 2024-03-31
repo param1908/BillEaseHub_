@@ -15,6 +15,8 @@ import {
   updateCategoryApi,
 } from "../../../services/merchant.service";
 import SweetAlert from "react-bootstrap-sweetalert";
+import { useNavigate } from "react-router-dom";
+import Pagination from "react-js-pagination";
 
 const Category = () => {
   const [showModal, setShowModal] = useState(false);
@@ -26,10 +28,14 @@ const Category = () => {
   const [editableImage, setEditableImage] = useState("");
   const [showAlert, setShowAlert] = useState(false);
   const [tempId, setTempId] = useState("");
-
+  const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
-
   const [total, setTotal] = useState(0);
+
+  const handlePageChange = (pageNumber) => {
+    setPaginate({ ...paginate, page: pageNumber });
+    // getAllCategories({ ...paginate, page: pageNumber });
+  };
 
   const options = [
     { value: "Active", label: "Active" },
@@ -64,7 +70,7 @@ const Category = () => {
   const categorySchema = Yup.object().shape({
     name: Yup.string().required("Category name is required"),
     image: !isEdit
-      ? Yup.string().required("Profile image is required")
+      ? Yup.string().required("Category image is required")
       : Yup.string(),
     description: Yup.string().required("Description is required"),
     status: Yup.object().required("Status is required"),
@@ -119,14 +125,15 @@ const Category = () => {
 
   useEffect(() => {
     getAllCategories();
-  }, [search]);
+  }, [search, paginate]);
 
   const getAllCategories = async () => {
     try {
-      const payload = {
+      let payload = {
         ...paginate,
       };
-      if (search) payload.search = search;
+      // if (paginateData) payload = { ...paginateData };
+      if (search) payload = { ...paginate, search };
       const categoryData = await getAllCategoriesApi(payload);
       setCategories(categoryData?.data?.categoryDetails);
       setTotal(categoryData?.data?.total);
@@ -167,7 +174,10 @@ const Category = () => {
 
   return (
     <>
-      <div className="card card-custom card-stretch gutter-b mb-10">
+      <div
+        className="card card-custom card-stretch gutter-b mb-10"
+        style={{ minHeight: "calc(100vh - 130px)" }}
+      >
         <div className="card-header">
           <div class="card-title m-0 d-flex justify-content-between w-100">
             <h3 class="fw-bolder m-0">ALL Categories [ {total} ]</h3>
@@ -182,7 +192,10 @@ const Category = () => {
                   data-kt-user-table-filter="search"
                   class="form-control form-control-solid w-250px ps-14"
                   placeholder="Search Category"
-                  onKeyUp={(e) => setSearch(e.target.value)}
+                  onKeyUp={(e) => {
+                    setPaginate({ ...paginate, page: 1 });
+                    setSearch(e.target.value);
+                  }}
                 />
               </div>
               <div
@@ -190,7 +203,7 @@ const Category = () => {
                 data-bs-toggle="tooltip"
                 data-bs-placement="top"
                 data-bs-trigger="hover"
-                title="Click to add a user"
+                title="Click to add a category"
                 onClick={() => {
                   handleOpenModal();
                   setIsEdit(false);
@@ -222,7 +235,9 @@ const Category = () => {
                           <div class="overlay-layer">
                             <a
                               class="btn btn-light-primary font-weight-bolder py-2 font-size-sm me-2 cursor-pointer"
-                              onClick={() => handleEdit(el)}
+                              onClick={() => {
+                                handleEdit(el);
+                              }}
                             >
                               Edit
                             </a>
@@ -238,7 +253,14 @@ const Category = () => {
                           </div>
                         </div>
 
-                        <div class="text-center mt-5 mb-md-0 mb-lg-5 mb-md-0 mb-lg-5 mb-lg-0 mb-5 d-flex flex-column">
+                        <div
+                          class="text-center mt-5 mb-md-0 mb-lg-5 mb-md-0 mb-lg-5 mb-lg-0 mb-5 d-flex flex-column cursor-pointer"
+                          onClick={() =>
+                            navigate(
+                              `/merchant/product?category=${el?._id}&name=${el?.name}`
+                            )
+                          }
+                        >
                           <a
                             href="#"
                             class="font-size-h5 font-weight-bolder text-dark-75 text-hover-primary mb-1"
@@ -258,6 +280,17 @@ const Category = () => {
               })}
           </div>
         </div>
+        {total > 12 && (
+          <Pagination
+            activePage={paginate?.page}
+            itemsCountPerPage={paginate?.limit}
+            totalItemsCount={total}
+            pageRangeDisplayed={5}
+            onChange={handlePageChange}
+            itemClass="page-item"
+            linkClass="page-link"
+          />
+        )}
       </div>
       <Modal
         id="kt_modal_create_app"
@@ -491,7 +524,7 @@ const Category = () => {
                         className="btn btn-primary"
                         data-kt-users-modal-action="submit"
                       >
-                        <span className="indicator-label">Submit</span>
+                        <span className="indicator-label">Add</span>
                       </button>
                     )}
                   </div>

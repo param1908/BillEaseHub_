@@ -9,15 +9,19 @@ import product1 from "../../../../_metronic/assets/images/products/1.png";
 import blackImage from "../../../../_metronic/assets/images/svg/files/blank-image.svg";
 import { KTIcon } from "../../../../_metronic/helpers";
 import {
-  addCategoryApi,
-  deleteCategoryApi,
+  addProductApi,
+  deleteProductApi,
   getAllCategoriesApi,
   getAllProductsApi,
-  updateCategoryApi,
+  updateProductApi,
 } from "../../../services/merchant.service";
 import SweetAlert from "react-bootstrap-sweetalert";
+import moment from "moment";
+import { useNavigate } from "react-router-dom";
+import Pagination from "react-js-pagination";
 
 const Product = () => {
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -27,21 +31,49 @@ const Product = () => {
   const [editableImage, setEditableImage] = useState("");
   const [showAlert, setShowAlert] = useState(false);
   const [tempId, setTempId] = useState("");
-
+  const [catId, setCatId] = useState("");
+  const [catName, setCatName] = useState("");
   const [products, setProducts] = useState([]);
-
   const [total, setTotal] = useState(0);
 
   const options = [
     { value: "Active", label: "Active" },
     { value: "Inactive", label: "In Active" },
   ];
+  const [catOptions, setCatOptions] = useState([]);
 
   const handleOpenModal = () => {
     setShowModal(true);
     formik.resetForm();
     setSelectedImage(null);
     setEditableImage("");
+  };
+
+  useEffect(() => {
+    getCategories();
+  }, [catId]);
+
+  const handlePageChange = (pageNumber) => {
+    setPaginate({ ...paginate, page: pageNumber });
+  };
+
+  const getCategories = async () => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const searchValue = searchParams.get("category");
+    const payload = {
+      sortBy: "name",
+      sortOrder: "asc",
+    };
+    const categoryData = await getAllCategoriesApi(payload);
+    console.log("data", categoryData);
+    let catData = categoryData?.data?.categoryDetails.map((el) => {
+      return { value: el._id, label: el.name };
+    });
+    if (searchValue) {
+      catData = catData.filter((el) => el.value === searchValue);
+    }
+    setCatOptions(catData);
+    console.log("catData", catData);
   };
 
   const handleClose = () => {
@@ -52,6 +84,12 @@ const Product = () => {
     console.log("file", event);
     const file = event.target.files[0];
     if (file) {
+      const fileType = file.type;
+      if (!/^image\/(png|jpg|jpeg)$/.test(fileType)) {
+        toast.error("Please select a valid image file (PNG, JPG, JPEG).");
+        event.target.value = "";
+        return;
+      }
       const reader = new FileReader();
       reader.onload = (e) => {
         const base64String = reader.result;
@@ -63,12 +101,14 @@ const Product = () => {
   };
 
   const categorySchema = Yup.object().shape({
-    name: Yup.string().required("Category name is required"),
+    name: Yup.string().required("Product name is required"),
     image: !isEdit
-      ? Yup.string().required("Profile image is required")
+      ? Yup.string().required("Product image is required")
       : Yup.string(),
     description: Yup.string().required("Description is required"),
     status: Yup.object().required("Status is required"),
+    category: Yup.object().required("Category is required"),
+    price: Yup.string().required("Price is required"),
   });
 
   const initialValues = {
@@ -76,7 +116,8 @@ const Product = () => {
     image: "",
     description: "",
     status: null,
-    categoryId: "",
+    category: "",
+    price: "",
   };
 
   const formik = useFormik({
@@ -87,22 +128,28 @@ const Product = () => {
       try {
         let response;
         if (isEdit) {
+          console.log("price", values);
           const payload = {
-            categoryId: values?.categoryId,
+            productId: values?.productId,
           };
           if (values?.name) payload.name = values?.name;
           if (values?.description) payload.description = values?.description;
           if (values?.status) payload.status = values?.status?.value;
+          if (values?.price) payload.price = String(values?.price);
+          if (values?.category) payload.categoryId = values?.category?.value;
           if (selectedImage) payload.image = selectedImage;
-          response = await updateCategoryApi(payload);
+          response = await updateProductApi(payload);
         } else {
           const payload = {
             name: values?.name,
             description: values?.description,
             status: values?.status?.value,
+            price: String(values?.price),
+            categoryId: values?.category?.value,
             image: selectedImage,
           };
-          response = await addCategoryApi(payload);
+          console.log("val", values);
+          response = await addProductApi(payload);
         }
         console.log(values, selectedImage);
 
@@ -120,14 +167,23 @@ const Product = () => {
 
   useEffect(() => {
     getAllProducts();
-  }, [search]);
+  }, [search, catId, paginate]);
 
   const getAllProducts = async () => {
+    setLoading(true);
     try {
-      const payload = {
+      let payload = {
         ...paginate,
       };
-      if (search) payload.search = search;
+      const searchParams = new URLSearchParams(window.location.search);
+      const searchValue = searchParams.get("category");
+      if (searchValue) {
+        console.log("searchValue", searchValue);
+        setCatId(searchValue);
+        setCatName(searchParams.get("name"));
+      }
+      if (searchValue) payload = { ...payload, categoryId: searchValue };
+      if (search) payload = { ...payload, search };
       const categoryData = await getAllProductsApi(payload);
       setProducts(categoryData?.data?.productDetails);
       setTotal(categoryData?.data?.total);
@@ -138,6 +194,7 @@ const Product = () => {
   };
 
   const handleEdit = (el) => {
+    let cat = catOptions.find((obj) => obj.value === el.categoryData._id);
     setIsEdit(true);
     setSelectedImage(null);
     console.log("el", el);
@@ -149,29 +206,57 @@ const Product = () => {
         el?.status === "Active"
           ? { value: "Active", label: "Active" }
           : { value: "Inactive", label: "In Active" },
-      categoryId: el?._id,
+      category: cat,
+      price: String(el?.price),
+      productId: el?._id,
     });
-    setEditableImage(el?.categoryImgUrl + el?.image);
-    console.log("formic", formik.values);
+    setEditableImage(el?.productImageUrl + el?.image);
   };
 
   const deleteCategory = async () => {
     console.log("first", tempId);
     if (tempId) {
-      let response = await deleteCategoryApi(tempId);
+      let response = await deleteProductApi(tempId);
       if (response["ResponseCode"] == 1) {
         toast.success(response?.message);
-        await getAllProducts();
         setShowAlert(false);
+        await getAllProducts();
       }
     }
   };
   return (
     <>
-      <div className="card card-custom card-stretch gutter-b mb-10">
+      <div
+        className="card card-custom card-stretch gutter-b mb-10"
+        style={{ minHeight: "calc(100vh - 130px)" }}
+      >
         <div className="card-header">
           <div class="card-title m-0 d-flex justify-content-between w-100">
-            <h3 class="fw-bolder m-0">ALL Products [ {total} ]</h3>
+            <h3 class="fw-bolder m-0 d-flex align-items-center">
+              <p className="mb-0">
+                {catId ? catName + "'s" : "ALL"} Products [ {total} ]
+              </p>
+              {catId && (
+                <div
+                  className="card-toolbar ms-4"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  data-bs-trigger="hover"
+                  title="Click to show all products"
+                >
+                  <a
+                    onClick={() => {
+                      setCatId("");
+                      setPaginate({ ...paginate, page: 1 });
+                      navigate("/merchant/product");
+                    }}
+                    class="btn btn-sm btn-light-primary py-2 cursor-pointer"
+                  >
+                    All Products
+                  </a>
+                </div>
+              )}
+            </h3>
             <div className="d-flex">
               <div class="d-flex align-items-center position-relative my-1 me-md-2">
                 <i class="ki-duotone ki-magnifier fs-1 position-absolute ms-6">
@@ -183,7 +268,10 @@ const Product = () => {
                   data-kt-user-table-filter="search"
                   class="form-control form-control-solid w-250px ps-14"
                   placeholder="Search Product"
-                  onKeyUp={(e) => setSearch(e.target.value)}
+                  onKeyUp={(e) => {
+                    setPaginate({ ...paginate, page: 1 });
+                    setSearch(e.target.value);
+                  }}
                 />
               </div>
               <div
@@ -191,13 +279,13 @@ const Product = () => {
                 data-bs-toggle="tooltip"
                 data-bs-placement="top"
                 data-bs-trigger="hover"
-                title="Click to add a user"
+                title="Click to add a product"
                 onClick={() => {
                   handleOpenModal();
                   setIsEdit(false);
                 }}
               >
-                <a href="#" class="btn btn-sm btn-light-primary py-4">
+                <a class="btn btn-sm btn-light-primary py-4 cursor-pointer">
                   <i class="ki-duotone ki-plus fs-3"></i>Add Product
                 </a>
               </div>
@@ -215,24 +303,27 @@ const Product = () => {
                 <thead>
                   <tr class="text-start text-muted fw-bolder fs-7 text-uppercase gs-0">
                     <th colspan="1" role="columnheader" class="min-w-125px">
-                      Name
+                      Product
                     </th>
                     <th colspan="1" role="columnheader" class="min-w-125px">
-                      Role
+                      DESCRIPTION
                     </th>
                     <th colspan="1" role="columnheader" class="min-w-125px">
-                      Last login
+                      Price
                     </th>
                     <th colspan="1" role="columnheader" class="min-w-125px">
-                      Two steps
+                      Category
                     </th>
                     <th colspan="1" role="columnheader" class="min-w-125px">
-                      Joined day
+                      CREATED DATE
+                    </th>
+                    <th colspan="1" role="columnheader" class="min-w-125px">
+                      Status
                     </th>
                     <th
                       colspan="1"
                       role="columnheader"
-                      class="text-end min-w-100px"
+                      class="text-center min-w-100px"
                     >
                       Actions
                     </th>
@@ -242,12 +333,12 @@ const Product = () => {
                   {products.length &&
                     products.map((el, index) => {
                       return (
-                        <tr role="row">
+                        <tr role="row" key={index}>
                           <td role="cell" class="">
                             <div class="d-flex align-items-center">
                               <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
-                                <a href="#">
-                                  <div class="symbol-label fs-3 bg-light-danger text-danger">
+                                <a>
+                                  <div class="symbol-label fs-3 bg-light-danger text-danger cursor-pointer">
                                     <img
                                       src={el?.productImageUrl + el?.image}
                                       alt="logo"
@@ -257,53 +348,70 @@ const Product = () => {
                                 </a>
                               </div>
                               <div class="d-flex flex-column">
-                                <a
-                                  href="#"
-                                  class="text-gray-800 text-hover-primary mb-1 text-capitalize"
-                                >
+                                <a class="text-gray-800 text-hover-primary mb-1 text-capitalize cursor-pointer">
                                   {el?.name}
                                 </a>
-                                <span>melody@altbox.com</span>
                               </div>
                             </div>
                           </td>
                           <td role="cell" class="">
-                            Analyst
+                            {el.description?.length > 70
+                              ? el.description?.slice(0, 70) + "...."
+                              : el.description}
+                          </td>
+                          <td role="cell" class="text-capitalize">
+                            {el?.price}
+                          </td>
+                          <td role="cell" class="text-capitalize">
+                            {el?.categoryData?.name}
                           </td>
                           <td role="cell" class="">
                             <div class="badge badge-light fw-bolder">
-                              20 mins ago
+                              {moment(el?.createdAt).format("DD-MM-YYYY")}
                             </div>
                           </td>
                           <td role="cell" class="">
                             {" "}
-                            <div class="badge badge-light-success fw-bolder">
-                              Active
-                            </div>
+                            {el?.status == "Active" ? (
+                              <div class="badge badge-light-success fw-bolder">
+                                Active
+                              </div>
+                            ) : (
+                              <div class="badge badge-light-danger fw-bolder">
+                                In Active
+                              </div>
+                            )}
                           </td>
-                          <td role="cell" class="">
-                            10 Nov 2022, 8:43 pm
-                          </td>
+
                           <td role="cell" class="text-end min-w-100px">
                             <a
-                              href="#"
-                              class="btn btn-light btn-active-light-primary btn-sm"
+                              class="btn btn-light btn-active-light-primary btn-sm d-flex align-items-center cursor-pointer"
                               data-kt-menu-trigger="click"
                               data-kt-menu-placement="bottom-end"
                             >
-                              Actions<i class="ki-duotone ki-down fs-5 m-0"></i>
+                              Actions
+                              <i class="ki-duotone ki-down fs-5 m-0 ms-2"></i>
                             </a>
                             <div
                               class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4"
                               data-kt-menu="true"
                             >
                               <div class="menu-item px-3">
-                                <a class="menu-link px-3">Edit</a>
+                                <a
+                                  class="menu-link px-3"
+                                  onClick={() => handleEdit(el)}
+                                >
+                                  Edit
+                                </a>
                               </div>
                               <div class="menu-item px-3">
                                 <a
                                   class="menu-link px-3"
                                   data-kt-users-table-filter="delete_row"
+                                  onClick={() => {
+                                    setShowAlert(true);
+                                    setTempId(el?._id);
+                                  }}
                                 >
                                   Delete
                                 </a>
@@ -317,6 +425,17 @@ const Product = () => {
               </table>
             </div>
           </div>
+          {total > 12 && (
+            <Pagination
+              activePage={paginate?.page}
+              itemsCountPerPage={paginate?.limit}
+              totalItemsCount={total}
+              pageRangeDisplayed={5}
+              onChange={handlePageChange}
+              itemClass="page-item"
+              linkClass="page-link"
+            />
+          )}
         </div>
       </div>
 
@@ -336,7 +455,7 @@ const Product = () => {
           id="kt_login_signin_form"
         >
           <div className="modal-header justify-content-between">
-            <h2 className="m-0">{isEdit ? "Edit" : "Add"} Category</h2>
+            <h2 className="m-0">{isEdit ? "Edit" : "Add"} Product</h2>
             <div
               className="btn btn-sm btn-icon btn-active-color-primary"
               onClick={handleClose}
@@ -423,7 +542,7 @@ const Product = () => {
                     </div>
 
                     <div class="text-muted fs-7">
-                      Set the category thumbnail image. Only *.png, *.jpg and
+                      Set the product thumbnail image. Only *.png, *.jpg and
                       *.jpeg image files are accepted
                     </div>
                     {formik.touched.image && formik.errors.image && (
@@ -498,34 +617,101 @@ const Product = () => {
                           </div>
                         )}
                     </div>
-                    <Select
-                      theme={"dark"}
-                      type="select"
-                      placeholder={"Select Status"}
-                      options={options}
-                      onChange={(option) => {
-                        formik.setFieldValue("status", option);
-                      }}
-                      value={formik.values.status}
-                      className={clsx(
-                        "form-control bg-transparent beh-select",
-                        {
-                          "is-invalid":
-                            formik.touched.status && formik.errors.status,
-                        },
-                        {
-                          "is-valid":
-                            formik.touched.status && !formik.errors.status,
-                        }
-                      )}
-                    />
-                    {formik.touched.status && formik.errors.status && (
-                      <div className="fv-plugins-message-container">
-                        <div className="fv-help-block">
-                          <span role="alert">{formik.errors.status}</span>
+                    <div className="fv-row mb-8">
+                      <input
+                        placeholder="Price"
+                        {...formik.getFieldProps("price")}
+                        className={clsx(
+                          "form-control bg-transparent",
+                          {
+                            "is-invalid":
+                              formik.touched.price && formik.errors.price,
+                          },
+                          {
+                            "is-valid":
+                              formik.touched.price && !formik.errors.price,
+                          }
+                        )}
+                        type="text"
+                        name="price"
+                        autoComplete="off"
+                        onKeyPress={(event) => {
+                          if (!/[0-9]/.test(event.key)) {
+                            event.preventDefault();
+                          }
+                        }}
+                      />
+                      {formik.touched.price && formik.errors.price && (
+                        <div className="fv-plugins-message-container">
+                          <div className="fv-help-block">
+                            <span role="alert">{formik.errors.price}</span>
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
+
+                    <div className="mb-8">
+                      <Select
+                        theme={"dark"}
+                        type="select"
+                        placeholder={"Select Category"}
+                        options={catOptions}
+                        onChange={(option) => {
+                          formik.setFieldValue("category", option);
+                        }}
+                        value={formik.values.category}
+                        className={clsx(
+                          "form-control bg-transparent beh-select",
+                          {
+                            "is-invalid":
+                              formik.touched.category && formik.errors.category,
+                          },
+                          {
+                            "is-valid":
+                              formik.touched.category &&
+                              !formik.errors.category,
+                          }
+                        )}
+                      />
+                      {formik.touched.category && formik.errors.category && (
+                        <div className="fv-plugins-message-container">
+                          <div className="fv-help-block">
+                            <span role="alert">{formik.errors.category}</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <div className="mb-8">
+                      {" "}
+                      <Select
+                        theme={"dark"}
+                        type="select"
+                        placeholder={"Select Status"}
+                        options={options}
+                        onChange={(option) => {
+                          formik.setFieldValue("status", option);
+                        }}
+                        value={formik.values.status}
+                        className={clsx(
+                          "form-control bg-transparent beh-select",
+                          {
+                            "is-invalid":
+                              formik.touched.status && formik.errors.status,
+                          },
+                          {
+                            "is-valid":
+                              formik.touched.status && !formik.errors.status,
+                          }
+                        )}
+                      />
+                      {formik.touched.status && formik.errors.status && (
+                        <div className="fv-plugins-message-container">
+                          <div className="fv-help-block">
+                            <span role="alert">{formik.errors.status}</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <div className="text-end">
                     <button
@@ -552,7 +738,7 @@ const Product = () => {
                         className="btn btn-primary"
                         data-kt-users-modal-action="submit"
                       >
-                        <span className="indicator-label">Submit</span>
+                        <span className="indicator-label">Add</span>
                       </button>
                     )}
                   </div>
