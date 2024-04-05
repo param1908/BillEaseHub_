@@ -138,3 +138,41 @@ export const deleteProductApi = async (payload) => {
     throw error;
   }
 };
+
+export const getAllTaxApi = async (payload) => {
+  try {
+    const userResponse = await axiosApi.post("/v1/merchant/get-tax", payload);
+    return userResponse?.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const addTaxApi = async (payload) => {
+  try {
+    const userResponse = await axiosApi.post("/v1/merchant/add-tax", payload);
+    return userResponse?.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateTaxApi = async (payload) => {
+  try {
+    const userResponse = await axiosApi.put("/v1/merchant/update-tax", payload);
+    return userResponse?.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteTaxApi = async (payload) => {
+  try {
+    const userResponse = await axiosApi.delete(
+      "/v1/merchant/delete-tax/" + payload
+    );
+    return userResponse?.data;
+  } catch (error) {
+    throw error;
+  }
+};

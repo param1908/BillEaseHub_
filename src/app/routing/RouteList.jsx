@@ -5,6 +5,7 @@ import { DashboardWrapper } from "../pages/customer/dashboard/DashboardWrapper";
 import { MDashboardWrapper } from "../pages/merchant/dashboard/MDashboardWrapper";
 import Category from "../pages/merchant/category/Category";
 import Product from "../pages/merchant/product/Product";
+import Tax from "../pages/merchant/tax/Tax";
 const { customer, merchant, admin } = UserRoles;
 const { BEFORE_AUTH, AFTER_AUTH, DEFAULT } = LayoutTypes;
 
@@ -136,6 +137,16 @@ export const routeList = [
     path: "/merchant/product",
     name: "Product",
     element: <Product />,
+    layoutType: AFTER_AUTH,
+    isAuthRequired: true,
+    accessRoles: [merchant],
+  },
+  {
+    id: "CUST_12",
+    icon: "",
+    path: "/merchant/tax",
+    name: "Tax",
+    element: <Tax />,
     layoutType: AFTER_AUTH,
     isAuthRequired: true,
     accessRoles: [merchant],
