@@ -26,6 +26,8 @@ const GenerateBill = () => {
     productErr: false,
     quantityErr: false,
     disableProd: true,
+    disableQty: true,
+    disablePrice: true,
   };
   const [product, setProduct] = useState([productObj]);
 
@@ -87,7 +89,12 @@ const GenerateBill = () => {
         }
         setProduct(prodData);
 
-        const payload = { categoryId: option?.value };
+        const payload = {
+          categoryId: option?.value,
+          page: 1,
+          limit: 500000,
+          status: "Active",
+        };
         const response = await getAllProductsApi(payload);
         let produstDetail = response?.data?.productDetails.map((el) => {
           return { value: el._id, label: el.name, price: el.price };
@@ -157,6 +164,8 @@ const GenerateBill = () => {
       !prodData[index].quantity
         ? (prodData[index].quantityErr = true)
         : (prodData[index].quantityErr = false);
+      prodData[index].disablePrice = false;
+      prodData[index].disableQty = false;
       setProduct(prodData);
       setSelectedProduct(option);
     } else {
@@ -377,6 +386,7 @@ const GenerateBill = () => {
                                 onChange={(e) => {
                                   handleInputChange(e, index);
                                 }}
+                                disabled={el?.disableQty}
                               />
                             </td>
                             <td>
@@ -402,6 +412,7 @@ const GenerateBill = () => {
                                 onFocus={(e) => {
                                   e.target.select();
                                 }}
+                                disabled={el?.disablePrice}
                               />
                             </td>
                             <td className="pt-8 text-end text-nowrap">
