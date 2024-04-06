@@ -5,7 +5,6 @@ import { Button, Modal } from "react-bootstrap";
 import * as Yup from "yup";
 import Select from "react-select";
 import { toast } from "react-toastify";
-import product1 from "../../../../_metronic/assets/images/products/1.png";
 import blackImage from "../../../../_metronic/assets/images/svg/files/blank-image.svg";
 import { KTIcon } from "../../../../_metronic/helpers";
 import {

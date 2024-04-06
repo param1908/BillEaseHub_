@@ -6,7 +6,6 @@ import { ScrollTop } from "./components/scroll-top";
 import { Content } from "./components/content";
 import {
   ActivityDrawer,
-  DrawerMessenger,
   InviteUsers,
   UpgradePlan,
 } from "../../_metronic/partials";
@@ -78,7 +77,6 @@ const MasterLayout = () => {
           {/* begin:: Drawers */}
           <ActivityDrawer />
           <RightToolbar />
-          <DrawerMessenger />
           {/* end:: Drawers */}
 
           {/* begin:: Modals */}

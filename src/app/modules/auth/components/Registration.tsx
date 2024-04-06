@@ -183,7 +183,7 @@ export function Registration() {
                             Merchant Account
                           </span>
                           <span className="text-gray-400 fw-bold fs-6">
-                            Create merchant account to mane users
+                            Create merchant account to manage customers bills
                           </span>
                         </span>
                       </label>
