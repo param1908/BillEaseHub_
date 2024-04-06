@@ -10,14 +10,21 @@ import {
   deleteTaxApi,
   getAllTaxApi,
   updateTaxApi,
+  updateUserDetailsApi,
 } from "../../../services/merchant.service";
 import SweetAlert from "react-bootstrap-sweetalert";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import Pagination from "react-js-pagination";
+import { useSelector } from "react-redux";
+import { getUserDetailsByToken } from "../../../services/common.service";
+import { useDispatch } from "react-redux";
+import { storeUserDetails } from "../../../store/slice/user.slice";
 
 const Tax = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { userDetails } = useSelector((state) => state.user);
   const [showModal, setShowModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -29,6 +36,8 @@ const Tax = () => {
   const [catId, setCatId] = useState("");
   const [tax, setTax] = useState([]);
   const [total, setTotal] = useState(0);
+  const [GSTIN, setGSTIN] = useState({ value: "", isError: false });
+  console.log("nnnnnnnnnnn", userDetails);
 
   const handleOpenModal = () => {
     setShowModal(true);
@@ -42,26 +51,6 @@ const Tax = () => {
 
   const handleClose = () => {
     setShowModal(false);
-  };
-
-  const handleImageChange = (event) => {
-    console.log("file", event);
-    const file = event.target.files[0];
-    if (file) {
-      const fileType = file.type;
-      if (!/^image\/(png|jpg|jpeg)$/.test(fileType)) {
-        toast.error("Please select a valid image file (PNG, JPG, JPEG).");
-        event.target.value = "";
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const base64String = reader.result;
-        console.log("baswe", base64String);
-        setSelectedImage(base64String); // Set selected image when it's loaded
-      };
-      reader.readAsDataURL(file);
-    }
   };
 
   const taxSchema = Yup.object().shape({
@@ -143,6 +132,24 @@ const Tax = () => {
     });
   };
 
+  const handleSubmitGSTIN = async () => {
+    try {
+      if (!GSTIN.value) {
+        setGSTIN({ ...GSTIN, isError: true });
+      } else {
+        const payload = {
+          GSTIN: GSTIN.value,
+        };
+        const response = await updateUserDetailsApi(payload);
+        if (response["ResponseCode"] == 1) {
+          toast.success(response?.message);
+          const userDetailsResponse = await getUserDetailsByToken();
+          dispatch(storeUserDetails(userDetailsResponse?.data));
+        }
+      }
+    } catch (error) {}
+  };
+
   const deleteCategory = async () => {
     console.log("first", tempId);
     if (tempId) {
@@ -203,139 +210,213 @@ const Tax = () => {
                   }}
                 />
               </div>
-              <div
-                className="card-toolbar"
-                data-bs-toggle="tooltip"
-                data-bs-placement="top"
-                data-bs-trigger="hover"
-                title="Click to add a tax"
-                onClick={() => {
-                  handleOpenModal();
-                  setIsEdit(false);
-                }}
+              {userDetails?.user?.merchantData?.GSTIN && (
+                <div
+                  className="card-toolbar"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  data-bs-trigger="hover"
+                  title="Click to add a tax"
+                  onClick={() => {
+                    handleOpenModal();
+                    setIsEdit(false);
+                  }}
+                >
+                  <a className="btn btn-sm btn-light-primary py-4 cursor-pointer">
+                    <i className="ki-duotone ki-plus fs-3"></i>Add Tax
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        {!userDetails?.user?.merchantData?.GSTIN && (
+          <div className="d-flex justify-content-center align-items-center my-10">
+            <div className="d-flex align-items-start">
+              <div className="me-5">
+                <div className="fv-row mb-8">
+                  <input
+                    placeholder="Enter GSTIN"
+                    className={clsx(
+                      "form-control bg-transparent",
+                      {
+                        "is-invalid": GSTIN?.isError,
+                      },
+                      {
+                        "is-valid": GSTIN?.isError,
+                      }
+                    )}
+                    type="name"
+                    name="name"
+                    autoComplete="off"
+                    value={GSTIN?.value}
+                    onChange={(e) =>
+                      setGSTIN({
+                        ...GSTIN,
+                        value: e.target.value,
+                        isError: e.target.value ? false : true,
+                      })
+                    }
+                    onKeyPress={(event) => {
+                      if (!/[0-9]/.test(event.key)) {
+                        event.preventDefault();
+                      }
+                    }}
+                  />
+                  {GSTIN?.isError && (
+                    <div className="fv-plugins-message-container">
+                      <div className="fv-help-block">
+                        <span role="alert">GSTIN is required</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <button
+                type="button"
+                className="btn btn-primary"
+                data-kt-users-modal-action="button"
+                onClick={() => handleSubmitGSTIN()}
               >
-                <a className="btn btn-sm btn-light-primary py-4 cursor-pointer">
-                  <i className="ki-duotone ki-plus fs-3"></i>Add Tax
-                </a>
+                <span className="indicator-label">Submit</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {userDetails?.user?.merchantData?.GSTIN && (
+          <div className="card-body h-auto">
+            <div className="card-body py-4">
+              <div className="table-responsive">
+                <table
+                  id="kt_table_users"
+                  className="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer"
+                  role="table"
+                >
+                  <thead>
+                    <tr className="text-start text-muted fw-bolder fs-7 text-uppercase gs-0">
+                      <th
+                        colspan="1"
+                        role="columnheader"
+                        className="min-w-125px"
+                      >
+                        No.
+                      </th>
+                      <th
+                        colspan="1"
+                        role="columnheader"
+                        className="min-w-125px"
+                      >
+                        Tax Name
+                      </th>
+                      <th
+                        colspan="1"
+                        role="columnheader"
+                        className="min-w-125px"
+                      >
+                        Tax Value
+                      </th>
+                      <th
+                        colspan="1"
+                        role="columnheader"
+                        className="min-w-125px"
+                      >
+                        CREATED DATE
+                      </th>
+                      <th
+                        colspan="1"
+                        role="columnheader"
+                        className="text-center min-w-100px"
+                      >
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-gray-600 fw-bold" role="rowgroup">
+                    {tax.length &&
+                      tax.map((el, index) => {
+                        return (
+                          <tr role="row" key={index}>
+                            <td role="cell" className="text-capitalize">
+                              {(paginate?.page - 1) * 10 + (index + 1)}
+                            </td>
+                            <td role="cell" className="">
+                              <div className="d-flex align-items-center">
+                                <div className="d-flex flex-column">
+                                  <a className="text-gray-800 text-hover-primary mb-1 text-capitalize cursor-pointer">
+                                    {el?.name}
+                                  </a>
+                                </div>
+                              </div>
+                            </td>
+                            <td role="cell" className="">
+                              {el?.tax}%
+                            </td>
+                            <td role="cell" className="">
+                              <div className="badge badge-light fw-bolder">
+                                {moment(el?.createdAt).format("DD-MM-YYYY")}
+                              </div>
+                            </td>
+
+                            <td
+                              role="cell"
+                              className="text-end min-w-100px d-flex justify-content-center"
+                            >
+                              <a
+                                className="btn btn-light btn-active-light-primary btn-sm d-flex align-items-center cursor-pointer"
+                                data-kt-menu-trigger="click"
+                                data-kt-menu-placement="bottom-end"
+                                style={{ maxWidth: "100px" }}
+                              >
+                                Actions
+                                <i className="ki-duotone ki-down fs-5 m-0 ms-2"></i>
+                              </a>
+                              <div
+                                className="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4"
+                                data-kt-menu="true"
+                              >
+                                <div className="menu-item px-3">
+                                  <a
+                                    className="menu-link px-3"
+                                    onClick={() => handleEdit(el)}
+                                  >
+                                    Edit
+                                  </a>
+                                </div>
+                                <div className="menu-item px-3">
+                                  <a
+                                    className="menu-link px-3"
+                                    data-kt-users-table-filter="delete_row"
+                                    onClick={() => {
+                                      setShowAlert(true);
+                                      setTempId(el?._id);
+                                    }}
+                                  >
+                                    Delete
+                                  </a>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </table>
               </div>
             </div>
+            {total > 12 && (
+              <Pagination
+                activePage={paginate?.page}
+                itemsCountPerPage={paginate?.limit}
+                totalItemsCount={total}
+                pageRangeDisplayed={5}
+                onChange={handlePageChange}
+                itemClass="page-item"
+                linkClass="page-link"
+              />
+            )}
           </div>
-        </div>
-        <div className="card-body h-auto">
-          <div className="card-body py-4">
-            <div className="table-responsive">
-              <table
-                id="kt_table_users"
-                className="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer"
-                role="table"
-              >
-                <thead>
-                  <tr className="text-start text-muted fw-bolder fs-7 text-uppercase gs-0">
-                    <th colspan="1" role="columnheader" className="min-w-125px">
-                      No.
-                    </th>
-                    <th colspan="1" role="columnheader" className="min-w-125px">
-                      Tax Name
-                    </th>
-                    <th colspan="1" role="columnheader" className="min-w-125px">
-                      Tax Value
-                    </th>
-                    <th colspan="1" role="columnheader" className="min-w-125px">
-                      CREATED DATE
-                    </th>
-                    <th
-                      colspan="1"
-                      role="columnheader"
-                      className="text-center min-w-100px"
-                    >
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="text-gray-600 fw-bold" role="rowgroup">
-                  {tax.length &&
-                    tax.map((el, index) => {
-                      return (
-                        <tr role="row" key={index}>
-                          <td role="cell" className="text-capitalize">
-                            {(paginate?.page - 1) * 10 + (index + 1)}
-                          </td>
-                          <td role="cell" className="">
-                            <div className="d-flex align-items-center">
-                              <div className="d-flex flex-column">
-                                <a className="text-gray-800 text-hover-primary mb-1 text-capitalize cursor-pointer">
-                                  {el?.name}
-                                </a>
-                              </div>
-                            </div>
-                          </td>
-                          <td role="cell" className="">
-                            {el?.tax}%
-                          </td>
-                          <td role="cell" className="">
-                            <div className="badge badge-light fw-bolder">
-                              {moment(el?.createdAt).format("DD-MM-YYYY")}
-                            </div>
-                          </td>
-
-                          <td
-                            role="cell"
-                            className="text-end min-w-100px d-flex justify-content-center"
-                          >
-                            <a
-                              className="btn btn-light btn-active-light-primary btn-sm d-flex align-items-center cursor-pointer"
-                              data-kt-menu-trigger="click"
-                              data-kt-menu-placement="bottom-end"
-                              style={{ maxWidth: "100px" }}
-                            >
-                              Actions
-                              <i className="ki-duotone ki-down fs-5 m-0 ms-2"></i>
-                            </a>
-                            <div
-                              className="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4"
-                              data-kt-menu="true"
-                            >
-                              <div className="menu-item px-3">
-                                <a
-                                  className="menu-link px-3"
-                                  onClick={() => handleEdit(el)}
-                                >
-                                  Edit
-                                </a>
-                              </div>
-                              <div className="menu-item px-3">
-                                <a
-                                  className="menu-link px-3"
-                                  data-kt-users-table-filter="delete_row"
-                                  onClick={() => {
-                                    setShowAlert(true);
-                                    setTempId(el?._id);
-                                  }}
-                                >
-                                  Delete
-                                </a>
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-          {total > 12 && (
-            <Pagination
-              activePage={paginate?.page}
-              itemsCountPerPage={paginate?.limit}
-              totalItemsCount={total}
-              pageRangeDisplayed={5}
-              onChange={handlePageChange}
-              itemClass="page-item"
-              linkClass="page-link"
-            />
-          )}
-        </div>
+        )}
       </div>
 
       <Modal

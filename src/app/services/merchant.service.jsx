@@ -176,3 +176,15 @@ export const deleteTaxApi = async (payload) => {
     throw error;
   }
 };
+
+export const updateUserDetailsApi = async (payload) => {
+  try {
+    const userResponse = await axiosApi.put(
+      "/v1/merchant/update-user-details",
+      payload
+    );
+    return userResponse?.data;
+  } catch (error) {
+    throw error;
+  }
+};
