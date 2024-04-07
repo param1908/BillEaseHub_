@@ -6,6 +6,7 @@ import CreatableSelect from "react-select/creatable";
 import {
   getAllCategoriesApi,
   getAllProductsApi,
+  getAllTaxApi,
 } from "../../../services/merchant.service";
 import clsx from "clsx";
 
@@ -14,6 +15,7 @@ const GenerateBill = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [productOptions, setProductOptions] = useState([]);
+  const [taxOptions, setTaxOptions] = useState([]);
   const productObj = {
     category: null,
     product: null,
@@ -40,10 +42,29 @@ const GenerateBill = () => {
 
     // Cleanup function
     getCategoryData();
+    getAllTax();
     return () => {
       invoiceDatePicker.destroy();
     };
   }, []);
+
+  const getAllTax = async () => {
+    try {
+      let payload = {
+        sortBy: "name",
+        sortOrder: "asc",
+      };
+
+      const taxData = await getAllTaxApi(payload);
+      let tax = taxData?.data?.taxDetails.map((el) => {
+        return { value: el._id, label: el.name, tax: el.tax };
+      });
+      setTaxOptions(tax);
+      console.log("tax", taxData);
+    } catch (error) {
+      console.log("err", error);
+    }
+  };
 
   const getCategoryData = async () => {
     try {
@@ -307,7 +328,7 @@ const GenerateBill = () => {
                     </div>
                     <div className="mb-5">
                       <input
-                        type="number"
+                        type="text"
                         className="form-control form-control-solid"
                         placeholder="Email"
                       />
@@ -317,7 +338,7 @@ const GenerateBill = () => {
                         name="notes"
                         className="form-control form-control-solid"
                         rows="3"
-                        placeholder="Who is this invoice from?"
+                        placeholder="Add Customer Notes"
                       ></textarea>
                     </div>
                   </div>
@@ -473,13 +494,13 @@ const GenerateBill = () => {
                           </button>
                         </th>
                         <th
-                          colSpan="2"
-                          className="border-bottom border-bottom-dashed ps-0"
+                          colSpan="1"
+                          className="border-bottom border-bottom-dashed ps-0 pe-0"
                         >
                           <div className="d-flex flex-column align-items-start">
-                            <div className="fs-5 py-1">Subtotal</div>
+                            <div className="fs-5 pb-2 mb-1">Subtotal</div>
                             <button
-                              className="btn btn-link py-1"
+                              className="btn btn-link py-2 mb-1"
                               data-bs-toggle="tooltip"
                               data-bs-trigger="hover"
                               title="Coming soon"
@@ -487,7 +508,7 @@ const GenerateBill = () => {
                               Add tax
                             </button>
                             <button
-                              className="btn btn-link py-1"
+                              className="btn btn-link py-2"
                               data-bs-toggle="tooltip"
                               data-bs-trigger="hover"
                               title="Coming soon"
@@ -497,19 +518,43 @@ const GenerateBill = () => {
                           </div>
                         </th>
                         <th
-                          colSpan="2"
+                          colSpan="3"
                           className="border-bottom border-bottom-dashed text-end"
                         >
-                          ₹
-                          <span data-kt-element="sub-total">
-                            {(() => {
-                              let total = 0;
-                              product.forEach((el) => {
-                                total += parseFloat(el.total);
-                              });
-                              return total;
-                            })()}
-                          </span>
+                          <div className="mb-3">
+                            ₹
+                            <span data-kt-element="sub-total">
+                              {(() => {
+                                let total = 0;
+                                product.forEach((el) => {
+                                  total += parseFloat(el.total);
+                                });
+                                return total;
+                              })()}
+                            </span>
+                          </div>
+                          <div className="d-flex align-items-center justify-content-end">
+                            <div>
+                              <CreatableSelect
+                                options={taxOptions}
+                                placeholder={"Select Tax"}
+                                isDisabled={false}
+                                maxMenuHeight={120}
+                              />
+                            </div>
+                            <input
+                              type="text"
+                              className={clsx(
+                                "form-control form-control-solid text-end ms-3 me-1"
+                              )}
+                              name="price"
+                              placeholder="0"
+                              data-kt-element="price"
+                              id="price-input"
+                              style={{ width: "50px" }}
+                            />
+                            %
+                          </div>
                         </th>
                       </tr>
                       <tr className="align-top fw-bold text-gray-700">
@@ -585,7 +630,7 @@ const GenerateBill = () => {
                     class="btn btn-primary w-100"
                     id="kt_invoice_submit_button"
                   >
-                    <span class="svg-icon svg-icon-3">
+                    <span class="svg-icon svg-icon-3 me-3">
                       <svg
                         width="24"
                         height="24"

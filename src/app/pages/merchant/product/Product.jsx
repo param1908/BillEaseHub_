@@ -37,8 +37,8 @@ const Product = () => {
   const [total, setTotal] = useState(0);
 
   const options = [
-    { value: "Active", label: "Stock" },
-    { value: "Inactive", label: "In Stock" },
+    { value: "Active", label: "In Stock" },
+    { value: "Inactive", label: "Out Of Stock" },
   ];
   const [catOptions, setCatOptions] = useState([]);
 
@@ -374,11 +374,11 @@ const Product = () => {
                             {" "}
                             {el?.status == "Active" ? (
                               <div class="badge badge-light-success fw-bolder">
-                                Stock
+                                In Stock
                               </div>
                             ) : (
                               <div class="badge badge-light-danger fw-bolder">
-                                In Stock
+                                Out Of Stock
                               </div>
                             )}
                           </td>
