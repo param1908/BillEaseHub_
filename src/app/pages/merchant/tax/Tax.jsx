@@ -494,11 +494,12 @@ const Tax = () => {
                         type="text"
                         name="tax"
                         autoComplete="off"
+                        maxLength={3}
                         onKeyPress={(event) => {
-                          console.log("first", event.target.value);
+                          const currentValue = event.target.value + event.key; // Combine current value with pressed key
                           if (
-                            !/[0-9]/.test(event.key) ||
-                            event.target.value.length >= 3
+                            !/^\d+$/.test(currentValue) ||
+                            parseInt(currentValue) > 100
                           ) {
                             event.preventDefault();
                           }

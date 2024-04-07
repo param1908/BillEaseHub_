@@ -9,13 +9,10 @@ import {
   getAllTaxApi,
 } from "../../../services/merchant.service";
 import clsx from "clsx";
+import { omit } from "lodash";
+import { toast } from "react-toastify";
 
 const GenerateBill = () => {
-  const invoiceDateRef = useRef(null);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [categoryOptions, setCategoryOptions] = useState([]);
-  const [productOptions, setProductOptions] = useState([]);
-  const [taxOptions, setTaxOptions] = useState([]);
   const productObj = {
     category: null,
     product: null,
@@ -30,8 +27,29 @@ const GenerateBill = () => {
     disableQty: true,
     disablePrice: true,
   };
+  const billObj = {
+    name: "",
+    phone: null,
+    email: "",
+    notes: "",
+    invoiceDate: "",
+    paymentMethod: null,
+    enableTax: false,
+    enableDiscount: false,
+    enableTaxCount: false,
+    addTax: null,
+    addDiscount: null,
+    taxError: false,
+    discError: false,
+  };
+  const invoiceDateRef = useRef(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [categoryOptions, setCategoryOptions] = useState([]);
+  const [productOptions, setProductOptions] = useState([]);
+  const [taxOptions, setTaxOptions] = useState([]);
+  const [errorMessages, setErrorMessages] = useState({});
   const [product, setProduct] = useState([productObj]);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
+  const [billDetails, setBillDetails] = useState(billObj);
 
   useEffect(() => {
     // Initialize Flatpickr
@@ -47,6 +65,44 @@ const GenerateBill = () => {
       invoiceDatePicker.destroy();
     };
   }, []);
+
+  const handleBillInput = (e) => {
+    console.log("billdetails", billDetails);
+
+    if (e.target.type === "checkbox") {
+      if (billDetails?.addTax?.__isNew__) {
+        billDetails.enableTaxCount = true;
+      } else {
+        billDetails.enableTaxCount = false;
+      }
+      e.target.name === "enableTax"
+        ? (billDetails.taxError = false)
+        : (billDetails.discError = false);
+      setBillDetails({
+        ...billDetails,
+        [e.target.name]: e.target.checked,
+      });
+      return;
+    }
+  };
+
+  const handleTaxChange = (option) => {
+    if (option) {
+      let setTaxData = {
+        ...billDetails,
+        addTax: option,
+        taxError: false,
+      };
+      if (option?.__isNew__) {
+        setTaxData.addTax.__isNew__ = true;
+        setTaxData.enableTaxCount = true;
+      } else {
+        setTaxData.addTax.__isNew__ = false;
+      }
+      setBillDetails(setTaxData);
+    }
+    console.log("option", option);
+  };
 
   const getAllTax = async () => {
     try {
@@ -134,10 +190,27 @@ const GenerateBill = () => {
     { value: "online", label: "Online" },
   ];
 
-  const handleAddItem = () => {
+  const handleAddItem = async () => {
     let productData = JSON.parse(JSON.stringify(product));
+    await handleProductError(productData);
+    let objectsWithNullName = productData.find(
+      (obj) =>
+        obj.priceErr === true ||
+        obj.categoryErr == true ||
+        obj.quantityErr == true ||
+        obj.productErr == true
+    );
+    if (objectsWithNullName) {
+      setProduct(productData);
+    } else {
+      setProduct([...product, productObj]);
+    }
+    console.log("objectsWithNullName", objectsWithNullName);
+  };
+
+  const handleProductError = (productData) => {
     productData.forEach((el) => {
-      if (!el.price) {
+      if (!el.disablePrice && !el.price) {
         el.priceErr = true;
       } else {
         el.priceErr = false;
@@ -158,19 +231,6 @@ const GenerateBill = () => {
         el.quantityErr = false;
       }
     });
-    let objectsWithNullName = productData.find(
-      (obj) =>
-        obj.priceErr === true ||
-        obj.categoryErr == true ||
-        obj.quantityErr == true ||
-        obj.productErr == true
-    );
-    if (objectsWithNullName) {
-      setProduct(productData);
-    } else {
-      setProduct([...product, productObj]);
-    }
-    console.log("objectsWithNullName", objectsWithNullName);
   };
 
   const handleProductSelect = (option, index) => {
@@ -218,7 +278,6 @@ const GenerateBill = () => {
         : (prodData[index].priceErr = false);
     }
 
-    console.log("prodData[index][e.target.name]", prodData[index]);
     setProduct(prodData);
   };
 
@@ -233,8 +292,135 @@ const GenerateBill = () => {
     setProduct(prodData);
   };
 
-  const submitBill = () => {
-    console.log("mmm", product);
+  const sendInvoice = async () => {
+    console.log("mmm", product, billDetails);
+    const productPayload = product;
+    let billPayload = billDetails;
+    const errors = validateBill({ ...billPayload });
+    let productData = JSON.parse(JSON.stringify(product));
+    await handleProductError(productData);
+    let objectsWithNullName = productData.find(
+      (obj) =>
+        obj.priceErr === true ||
+        obj.categoryErr == true ||
+        obj.quantityErr == true ||
+        obj.productErr == true
+    );
+    let taxError = billDetails.enableTax && !billDetails?.addTax ? true : false;
+    let discError =
+      billDetails.enableDiscount && !billDetails?.addDiscount ? true : false;
+    if (
+      Object.keys(errors).length === 0 &&
+      !objectsWithNullName &&
+      !taxError &&
+      !discError
+    ) {
+      console.log("success");
+    } else {
+      let err = { ...billDetails };
+      err = { ...err, taxError: taxError, discError: discError };
+      console.log("-------------", err);
+      setBillDetails(err);
+      toast.error("Please fill all required fields");
+      setProduct(productData);
+      setErrorMessages(errors);
+    }
+  };
+
+  const validateBill = (payload) => {
+    let errors = {};
+    const { name, phone, email, paymentMethod } = payload;
+    if (
+      email &&
+      !RegExp(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,5})+$/).test(email)
+    ) {
+      errors.emailError = "Please enter a valid email";
+    }
+    if (!name) {
+      errors.nameError = "Customer name is required";
+    }
+    console.log("phone", phone);
+    if (!phone) {
+      errors.phoneError = "Phone number is required";
+    } else if (phone.length < 10) {
+      errors.phoneError = "Phone number must be 10 digits";
+    }
+    if (!paymentMethod) {
+      errors.paymentMethodError = "Payment Method is required";
+    }
+    return errors;
+  };
+
+  const handleBillDetailsChange = (e, value) => {
+    if (value === "paymentMethod") {
+      setBillDetails({
+        ...billDetails,
+        [value]: e,
+      });
+    } else {
+      setBillDetails({ ...billDetails, [e.target.name]: e.target.value });
+    }
+    let data = {
+      name: value === "paymentMethod" ? value : e?.target?.name,
+      value: value === "paymentMethod" ? e : e.target.value,
+    };
+    const errors = validateOnchange(data.name, data.value, errorMessages);
+
+    setErrorMessages(errors);
+  };
+
+  const validateOnchange = (name, value, preserveError) => {
+    let errors = { ...preserveError };
+    switch (name) {
+      case "name":
+        if (!value) {
+          errors.nameError = "Customer name is required";
+        } else {
+          const newErrors = omit(errors, "nameError");
+          errors = newErrors;
+        }
+        break;
+      case "phone":
+        if (!value) {
+          errors.phoneError = "Phone number is required";
+        } else if (value.length < 10) {
+          errors.phoneError = "Phone number must be 10 digits";
+        } else {
+          const newErrors = omit(errors, "phoneError");
+          errors = newErrors;
+        }
+        break;
+      case "email":
+        if (
+          value &&
+          !RegExp(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,5})+$/).test(value)
+        ) {
+          errors.emailError = "Please enter a valid email";
+        } else {
+          const newErrors = omit(errors, "emailError");
+          errors = newErrors;
+        }
+        break;
+      case "password":
+        if (!value) {
+          errors.passwordError = "Password is required";
+        } else {
+          const newErrors = omit(errors, "passwordError");
+          errors = newErrors;
+        }
+        break;
+      case "paymentMethod":
+        if (!value) {
+          errors.paymentMethodError = "Payment method is required";
+        } else {
+          const newErrors = omit(errors, "paymentMethodError");
+          errors = newErrors;
+        }
+        break;
+      default:
+        break;
+    }
+    return errors;
   };
 
   return (
@@ -317,21 +503,61 @@ const GenerateBill = () => {
                         type="text"
                         className="form-control form-control-solid"
                         placeholder="Name*"
+                        name="name"
+                        value={billDetails?.name}
+                        onChange={handleBillDetailsChange}
                       />
+                      {errorMessages?.nameError && (
+                        <div className="fv-plugins-message-container">
+                          <div className="fv-help-block px-2">
+                            <span role="alert">{errorMessages?.nameError}</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <div className="mb-5">
                       <input
-                        type="number"
+                        type="text"
                         className="form-control form-control-solid"
                         placeholder="Phone*"
+                        name="phone"
+                        maxLength={10}
+                        onKeyPress={(event) => {
+                          if (!/[0-9]/.test(event.key)) {
+                            event.preventDefault();
+                          }
+                        }}
+                        value={billDetails?.phone}
+                        onChange={handleBillDetailsChange}
                       />
+                      {errorMessages?.phoneError && (
+                        <div className="fv-plugins-message-container">
+                          <div className="fv-help-block px-2">
+                            <span role="alert">
+                              {errorMessages?.phoneError}
+                            </span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <div className="mb-5">
                       <input
                         type="text"
                         className="form-control form-control-solid"
                         placeholder="Email"
+                        name="email"
+                        value={billDetails?.email}
+                        onChange={handleBillDetailsChange}
                       />
+                      {errorMessages?.emailError && (
+                        <div className="fv-plugins-message-container">
+                          <div className="fv-help-block px-2">
+                            <span role="alert">
+                              {errorMessages?.emailError}
+                            </span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <div className="mb-5">
                       <textarea
@@ -339,11 +565,16 @@ const GenerateBill = () => {
                         className="form-control form-control-solid"
                         rows="3"
                         placeholder="Add Customer Notes"
+                        value={billDetails?.notes}
+                        onChange={handleBillDetailsChange}
                       ></textarea>
                     </div>
                   </div>
                 </div>
-                <div className="table-responsive mb-10">
+                <div
+                  className="table-responsive mb-10"
+                  style={{ overflowX: "inherit" }}
+                >
                   <table
                     className="table g-5 gs-0 mb-0 fw-bold text-gray-700"
                     data-kt-element="items"
@@ -500,7 +731,7 @@ const GenerateBill = () => {
                           <div className="d-flex flex-column align-items-start">
                             <div className="fs-5 pb-2 mb-1">Subtotal</div>
                             <button
-                              className="btn btn-link py-2 mb-1"
+                              className="btn btn-link py-3 mb-3"
                               data-bs-toggle="tooltip"
                               data-bs-trigger="hover"
                               title="Coming soon"
@@ -508,7 +739,7 @@ const GenerateBill = () => {
                               Add tax
                             </button>
                             <button
-                              className="btn btn-link py-2"
+                              className="btn btn-link py-3"
                               data-bs-toggle="tooltip"
                               data-bs-trigger="hover"
                               title="Coming soon"
@@ -533,27 +764,102 @@ const GenerateBill = () => {
                               })()}
                             </span>
                           </div>
+                          <div className="d-flex align-items-center justify-content-end mb-3">
+                            {billDetails?.enableTax ? (
+                              <div className="d-flex align-items-center justify-content-end">
+                                <div>
+                                  <CreatableSelect
+                                    options={taxOptions}
+                                    placeholder={"Select Tax"}
+                                    isDisabled={false}
+                                    maxMenuHeight={120}
+                                    value={billDetails?.addTax}
+                                    onChange={(value) => handleTaxChange(value)}
+                                    className={clsx(
+                                      billDetails?.taxError && "border-red"
+                                    )}
+                                  />
+                                </div>
+                                <input
+                                  type="text"
+                                  className={clsx(
+                                    "form-control form-control-solid text-end ms-3 me-1 px-2 py-2"
+                                  )}
+                                  name="price"
+                                  placeholder="0"
+                                  data-kt-element="price"
+                                  id="price-input"
+                                  style={{ width: "50px" }}
+                                  maxLength={3}
+                                  value={billDetails?.addTax?.tax}
+                                  disabled={!billDetails?.enableTaxCount}
+                                  onKeyPress={(event) => {
+                                    const currentValue =
+                                      event.target.value + event.key; // Combine current value with pressed key
+                                    if (
+                                      !/^\d+$/.test(currentValue) ||
+                                      parseInt(currentValue) > 100
+                                    ) {
+                                      event.preventDefault();
+                                    }
+                                  }}
+                                  onChange={(e) => {
+                                    const value = e.target.value;
+                                    setBillDetails({
+                                      ...billDetails,
+                                      addTax: {
+                                        ...billDetails.addTax,
+                                        tax: value,
+                                      },
+                                    });
+                                  }}
+                                />
+                                %
+                              </div>
+                            ) : (
+                              <div className="my-3">0%</div>
+                            )}
+                          </div>
                           <div className="d-flex align-items-center justify-content-end">
-                            <div>
-                              <CreatableSelect
-                                options={taxOptions}
-                                placeholder={"Select Tax"}
-                                isDisabled={false}
-                                maxMenuHeight={120}
-                              />
-                            </div>
-                            <input
-                              type="text"
-                              className={clsx(
-                                "form-control form-control-solid text-end ms-3 me-1"
-                              )}
-                              name="price"
-                              placeholder="0"
-                              data-kt-element="price"
-                              id="price-input"
-                              style={{ width: "50px" }}
-                            />
-                            %
+                            {billDetails?.enableDiscount ? (
+                              <div className="d-flex align-items-center">
+                                <input
+                                  type="text"
+                                  className={clsx(
+                                    "form-control form-control-solid text-end ms-3 me-1 ",
+                                    billDetails?.discError && "border-red"
+                                  )}
+                                  name="discount"
+                                  placeholder="Enter Discount"
+                                  data-kt-element="discount"
+                                  id="price-input"
+                                  maxLength={3}
+                                  onKeyPress={(event) => {
+                                    const currentValue =
+                                      event.target.value + event.key; // Combine current value with pressed key
+                                    if (
+                                      !/^\d+$/.test(currentValue) ||
+                                      parseInt(currentValue) > 100
+                                    ) {
+                                      event.preventDefault();
+                                    }
+                                  }}
+                                  value={billDetails?.addDiscount}
+                                  onChange={(e) => {
+                                    const value = e.target.value;
+                                    setBillDetails({
+                                      ...billDetails,
+                                      addDiscount: value,
+                                      discError: value ? false : true,
+                                    });
+                                  }}
+                                  style={{ width: "130px" }}
+                                />
+                                %
+                              </div>
+                            ) : (
+                              <div className="my-3">0%</div>
+                            )}
                           </div>
                         </th>
                       </tr>
@@ -563,18 +869,35 @@ const GenerateBill = () => {
                           Total
                         </th>
                         <th colSpan="2" className="text-end fs-4 text-nowrap">
-                          ₹<span data-kt-element="grand-total">0.00</span>
+                          ₹
+                          <span data-kt-element="grand-total">
+                            {(() => {
+                              let total = 0;
+                              product.forEach((el) => {
+                                total += parseFloat(el.total);
+                              });
+                              if (
+                                billDetails?.enableTax &&
+                                billDetails?.addTax?.tax
+                              ) {
+                                total +=
+                                  total *
+                                  (Number(billDetails?.addTax?.tax) / 100);
+                              }
+                              if (billDetails?.enableDiscount) {
+                                total =
+                                  total -
+                                  total *
+                                    (Number(billDetails?.addDiscount) / 100);
+                              }
+                              console.log("============", billDetails);
+                              return parseFloat(total.toFixed(2));
+                            })()}
+                          </span>
                         </th>
                       </tr>
                     </tfoot>
                   </table>
-                  <button
-                    className="btn btn-sm btn-light-primary fs-6 py-2"
-                    data-kt-element="add-item"
-                    onClick={submitBill}
-                  >
-                    Submit
-                  </button>
                 </div>
               </div>
             </div>
@@ -588,26 +911,50 @@ const GenerateBill = () => {
                   options={paymentMethodOptions}
                   isClearable={true}
                   placeholder={"Select Payment Method"}
-                  value={selectedPaymentMethod}
-                  onChange={(value) => {
-                    setSelectedPaymentMethod(value);
+                  value={billDetails?.paymentMethod}
+                  name="paymentMethod"
+                  onChange={(option) => {
+                    handleBillDetailsChange(option, "paymentMethod");
                   }}
                   maxMenuHeight={150}
                 />
+                {errorMessages?.paymentMethodError && (
+                  <div className="fv-plugins-message-container">
+                    <div className="fv-help-block px-2">
+                      <span role="alert">
+                        {errorMessages?.paymentMethodError}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
               <div class="separator separator-dashed mb-8"></div>
               <div class="mb-8">
-                <label class="form-check form-switch form-switch-sm form-check-custom form-check-solid flex-stack">
+                <label class="form-check form-switch form-switch-sm form-check-custom form-check-solid flex-stack mb-3">
                   <span class="form-check-label ms-0 fw-bold fs-6 text-gray-700">
                     Add Tax
                   </span>
-                  <input class="form-check-input" type="checkbox" value="" />
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    name="enableTax"
+                    value={billDetails?.enableTax}
+                    checked={billDetails?.enableTax == true ? true : false}
+                    onChange={handleBillInput}
+                  />
                 </label>
                 <label class="form-check form-switch form-switch-sm form-check-custom form-check-solid flex-stack mb-5">
                   <span class="form-check-label ms-0 fw-bold fs-6 text-gray-700">
                     Add Discount
                   </span>
-                  <input class="form-check-input" type="checkbox" value="" />
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    name="enableDiscount"
+                    value={billDetails?.enableDiscount}
+                    checked={billDetails?.enableDiscount == true ? true : false}
+                    onChange={handleBillInput}
+                  />
                 </label>
               </div>
               <div class="separator separator-dashed mb-8"></div>
@@ -617,6 +964,7 @@ const GenerateBill = () => {
                   href="#"
                   class="btn btn-primary w-100"
                   id="kt_invoice_submit_button"
+                  onClick={sendInvoice}
                 >
                   <span class="svg-icon svg-icon-3 me-3">
                     <svg

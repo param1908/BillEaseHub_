@@ -68,3 +68,10 @@
 .resize-none {
   resize: none;
 }
+
+.form-control:disabled {
+  color: var(--bs-gray-500);
+  background-color: var(--bs-gray-200);
+  border-color: var(--bs-gray-300);
+  opacity: 1;
+}
