@@ -943,7 +943,7 @@ const GenerateBill = () => {
                     onChange={handleBillInput}
                   />
                 </label>
-                <label class="form-check form-switch form-switch-sm form-check-custom form-check-solid flex-stack mb-5">
+                <label class="form-check form-switch form-switch-sm form-check-custom form-check-solid flex-stack">
                   <span class="form-check-label ms-0 fw-bold fs-6 text-gray-700">
                     Add Discount
                   </span>
