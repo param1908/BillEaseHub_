@@ -552,15 +552,15 @@ const GenerateBill = () => {
               </div>
               <div class="separator separator-dashed mb-8"></div>
               <div class="mb-8">
-                <label class="form-check form-switch form-switch-sm form-check-custom form-check-solid flex-stack mb-5">
-                  <span class="form-check-label ms-0 fw-bold fs-6 text-gray-700">
-                    Add Discount
-                  </span>
-                  <input class="form-check-input" type="checkbox" value="" />
-                </label>
                 <label class="form-check form-switch form-switch-sm form-check-custom form-check-solid flex-stack">
                   <span class="form-check-label ms-0 fw-bold fs-6 text-gray-700">
                     Add Tax
+                  </span>
+                  <input class="form-check-input" type="checkbox" value="" />
+                </label>
+                <label class="form-check form-switch form-switch-sm form-check-custom form-check-solid flex-stack mb-5">
+                  <span class="form-check-label ms-0 fw-bold fs-6 text-gray-700">
+                    Add Discount
                   </span>
                   <input class="form-check-input" type="checkbox" value="" />
                 </label>
