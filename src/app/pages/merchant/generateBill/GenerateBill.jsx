@@ -27,6 +27,12 @@ const GenerateBill = () => {
     disableQty: true,
     disablePrice: true,
   };
+  const taxObj = {
+    name: null,
+    taxError: false,
+    enableTaxCount: false,
+    taxCountError: false,
+  };
   const billObj = {
     name: "",
     phone: null,
@@ -36,11 +42,12 @@ const GenerateBill = () => {
     paymentMethod: null,
     enableTax: false,
     enableDiscount: false,
-    enableTaxCount: false,
-    addTax: null,
+    // enableTaxCount: false,
+    // addTax: null,
     addDiscount: null,
-    taxError: false,
+    // taxError: false,
     discError: false,
+    taxFields: [{ ...taxObj }],
   };
   const invoiceDateRef = useRef(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -81,25 +88,34 @@ const GenerateBill = () => {
       setBillDetails({
         ...billDetails,
         [e.target.name]: e.target.checked,
+        taxFields: [{ ...taxObj }],
+        addDiscount: null,
       });
       return;
     }
   };
 
-  const handleTaxChange = (option) => {
+  const handleTaxChange = (option, index) => {
     if (option) {
-      let setTaxData = {
-        ...billDetails,
-        addTax: option,
-        taxError: false,
-      };
+      let fields = [...billDetails.taxFields];
+      fields[index] = { name: { ...option }, taxError: false };
+
       if (option?.__isNew__) {
-        setTaxData.addTax.__isNew__ = true;
-        setTaxData.enableTaxCount = true;
+        fields[index].name = {
+          ...option,
+          __isNew__: true,
+          tax: 0,
+        };
+        fields[index].taxCountError = true;
+        fields[index].enableTaxCount = true;
       } else {
-        setTaxData.addTax.__isNew__ = false;
+        fields[index].name = { ...option, __isNew__: false };
       }
-      setBillDetails(setTaxData);
+
+      setBillDetails({
+        ...billDetails,
+        taxFields: fields,
+      });
     }
     console.log("option", option);
   };
@@ -116,7 +132,6 @@ const GenerateBill = () => {
         return { value: el._id, label: el.name, tax: el.tax };
       });
       setTaxOptions(tax);
-      console.log("tax", taxData);
     } catch (error) {
       console.log("err", error);
     }
@@ -140,10 +155,8 @@ const GenerateBill = () => {
   };
 
   const handleCategorySelect = async (option, index) => {
-    console.log("option", option, index);
     if (option) {
       try {
-        console.log("........");
         let prodData = JSON.parse(JSON.stringify(product));
         prodData[index].category = option;
         prodData[index].product = null;
@@ -206,6 +219,18 @@ const GenerateBill = () => {
       setProduct([...product, productObj]);
     }
     console.log("objectsWithNullName", objectsWithNullName);
+  };
+
+  const handleTaxCountChange = (e, index) => {
+    let fields = [...billDetails.taxFields];
+    fields[index].name.tax = e.target.value;
+    !e.target.value || e.target.value == 0
+      ? (fields[index].taxCountError = true)
+      : (fields[index].taxCountError = false);
+    setBillDetails({
+      ...billDetails,
+      taxFields: fields,
+    });
   };
 
   const handleProductError = (productData) => {
@@ -306,7 +331,10 @@ const GenerateBill = () => {
         obj.quantityErr == true ||
         obj.productErr == true
     );
-    let taxError = billDetails.enableTax && !billDetails?.addTax ? true : false;
+    let filterTax = billDetails.taxFields.filter((el) => {
+      return !el?.name || (el?.taxCountError && el?.taxCountError === true);
+    });
+    let taxError = billDetails.enableTax && filterTax?.length ? true : false;
     let discError =
       billDetails.enableDiscount && !billDetails?.addDiscount ? true : false;
     if (
@@ -315,10 +343,30 @@ const GenerateBill = () => {
       !taxError &&
       !discError
     ) {
-      console.log("success");
+      let prepareObject = {
+        ...billPayload,
+        products: productPayload,
+      };
+      console.log("success", prepareObject);
     } else {
       let err = { ...billDetails };
-      err = { ...err, taxError: taxError, discError: discError };
+      billDetails.taxFields.forEach((data) => {
+        if (!data.name) {
+          data.taxError = true;
+        }
+        if (data.name && !data.name.tax) {
+          data.taxCountError = true;
+        }
+        if (data.name && data.name.__isNew__) {
+          data.enableTaxCount = true;
+        }
+      });
+      err = {
+        ...err,
+        taxError: taxError,
+        discError: discError,
+        taxFields: billDetails.taxFields,
+      };
       console.log("-------------", err);
       setBillDetails(err);
       toast.error("Please fill all required fields");
@@ -421,6 +469,31 @@ const GenerateBill = () => {
         break;
     }
     return errors;
+  };
+
+  const handleAddTax = () => {
+    let fields = billDetails.taxFields;
+    billDetails?.taxFields.forEach((data) => {
+      if (!data.name) {
+        data.taxError = true;
+      }
+      if (data.name && !data.name.tax) {
+        data.taxCountError = true;
+      }
+      if (data.name && data.name.__isNew__) {
+        data.enableTaxCount = true;
+      }
+    });
+    const filterFields = billDetails?.taxFields?.filter(
+      (data) => data.taxError || data.taxCountError
+    );
+    if (!filterFields.length) {
+      fields.push(taxObj);
+    }
+    setBillDetails({
+      ...billDetails,
+      taxFields: fields,
+    });
   };
 
   return (
@@ -678,7 +751,7 @@ const GenerateBill = () => {
                             <td className="pt-5 text-end">
                               <button
                                 type="button"
-                                className="btn btn-sm btn-icon btn-active-color-primary"
+                                className="btn btn-sm btn-icon btn-active-color-primary cursor-pointer"
                                 data-kt-element="remove-item"
                                 onClick={() => handleRemoveItem(index)}
                                 disabled={product?.length === 1}
@@ -725,102 +798,159 @@ const GenerateBill = () => {
                           </button>
                         </th>
                         <th
-                          colSpan="1"
-                          className="border-bottom border-bottom-dashed ps-0 pe-0"
-                        >
-                          <div className="d-flex flex-column align-items-start">
-                            <div className="fs-5 pb-2 mb-1">Subtotal</div>
-                            <button
-                              className="btn btn-link py-3 mb-3"
-                              data-bs-toggle="tooltip"
-                              data-bs-trigger="hover"
-                              title="Coming soon"
-                            >
-                              Add tax
-                            </button>
-                            <button
-                              className="btn btn-link py-3"
-                              data-bs-toggle="tooltip"
-                              data-bs-trigger="hover"
-                              title="Coming soon"
-                            >
-                              Add discount
-                            </button>
-                          </div>
-                        </th>
-                        <th
-                          colSpan="3"
+                          colSpan="4"
                           className="border-bottom border-bottom-dashed text-end"
                         >
-                          <div className="mb-3">
-                            ₹
-                            <span data-kt-element="sub-total">
-                              {(() => {
-                                let total = 0;
-                                product.forEach((el) => {
-                                  total += parseFloat(el.total);
-                                });
-                                return total;
-                              })()}
-                            </span>
+                          <div className="d-flex justify-content-between align-items-center mb-3">
+                            <div className="fs-5 pe-4">Subtotal</div>
+                            <div>
+                              ₹
+                              <span data-kt-element="sub-total">
+                                {(() => {
+                                  let total = 0;
+                                  product.forEach((el) => {
+                                    total += parseFloat(el.total);
+                                  });
+                                  return total;
+                                })()}
+                              </span>
+                            </div>
                           </div>
-                          <div className="d-flex align-items-center justify-content-end mb-3">
-                            {billDetails?.enableTax ? (
-                              <div className="d-flex align-items-center justify-content-end">
-                                <div>
-                                  <CreatableSelect
-                                    options={taxOptions}
-                                    placeholder={"Select Tax"}
-                                    isDisabled={false}
-                                    maxMenuHeight={120}
-                                    value={billDetails?.addTax}
-                                    onChange={(value) => handleTaxChange(value)}
-                                    className={clsx(
-                                      billDetails?.taxError && "border-red"
-                                    )}
-                                  />
-                                </div>
-                                <input
-                                  type="text"
-                                  className={clsx(
-                                    "form-control form-control-solid text-end ms-3 me-1 px-2 py-2"
-                                  )}
-                                  name="price"
-                                  placeholder="0"
-                                  data-kt-element="price"
-                                  id="price-input"
-                                  style={{ width: "50px" }}
-                                  maxLength={3}
-                                  value={billDetails?.addTax?.tax}
-                                  disabled={!billDetails?.enableTaxCount}
-                                  onKeyPress={(event) => {
-                                    const currentValue =
-                                      event.target.value + event.key; // Combine current value with pressed key
-                                    if (
-                                      !/^\d+$/.test(currentValue) ||
-                                      parseInt(currentValue) > 100
-                                    ) {
-                                      event.preventDefault();
-                                    }
-                                  }}
-                                  onChange={(e) => {
-                                    const value = e.target.value;
-                                    setBillDetails({
-                                      ...billDetails,
-                                      addTax: {
-                                        ...billDetails.addTax,
-                                        tax: value,
-                                      },
-                                    });
-                                  }}
-                                />
-                                %
-                              </div>
-                            ) : (
-                              <div className="my-3">0%</div>
-                            )}
+                          {billDetails?.enableTax && (
+                            <div className="d-flex align-items-center justify-content-end">
+                              <button
+                                className="btn btn-sm btn-primary fs-6 py-0 px-2 ms-2"
+                                data-kt-element="add-item"
+                                onClick={handleAddTax}
+                              >
+                                +
+                              </button>
+                            </div>
+                          )}
+
+                          <div className="d-flex align-items-center justify-content-between mb-3">
+                            <button
+                              className="btn btn-link pe-4 d-flex align-items-center"
+                              data-bs-toggle="tooltip"
+                              data-bs-trigger="hover"
+                              title="Coming soon"
+                            >
+                              <span>Tax </span>
+                            </button>
+                            <div>
+                              {billDetails?.enableTax ? (
+                                billDetails?.taxFields?.map((el, index) => {
+                                  return (
+                                    <div className="d-flex align-items-center justify-content-end mt-1">
+                                      <button
+                                        type="button"
+                                        className="btn btn-sm btn-icon btn-active-color-primary cursor-pointer"
+                                        data-kt-element="remove-item"
+                                        onClick={() => {
+                                          let taxData = JSON.parse(
+                                            JSON.stringify(
+                                              billDetails.taxFields
+                                            )
+                                          );
+                                          taxData.splice(index, 1);
+                                          setBillDetails({
+                                            ...billDetails,
+                                            taxFields: taxData,
+                                          });
+                                        }}
+                                        disabled={
+                                          billDetails?.taxFields?.length === 1
+                                        }
+                                      >
+                                        <span className="svg-icon svg-icon-3 text-danger">
+                                          <svg
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <path
+                                              d="M5 9C5 8.44772 5.44772 8 6 8H18C18.5523 8 19 8.44772 19 9V18C19 19.6569 17.6569 21 16 21H8C6.34315 21 5 19.6569 5 18V9Z"
+                                              fill="currentColor"
+                                            />
+                                            <path
+                                              opacity="0.5"
+                                              d="M5 5C5 4.44772 5.44772 4 6 4H18C18.5523 4 19 4.44772 19 5V5C19 5.55228 18.5523 6 18 6H6C5.44772 6 5 5.55228 5 5V5Z"
+                                              fill="currentColor"
+                                            />
+                                            <path
+                                              opacity="0.5"
+                                              d="M9 4C9 3.44772 9.44772 3 10 3H14C14.5523 3 15 3.44772 15 4V4H9V4Z"
+                                              fill="currentColor"
+                                            />
+                                          </svg>
+                                        </span>
+                                      </button>
+                                      <div style={{ minWidth: "130px" }}>
+                                        <CreatableSelect
+                                          options={taxOptions}
+                                          placeholder={"Select Tax"}
+                                          isDisabled={false}
+                                          maxMenuHeight={120}
+                                          value={el?.name}
+                                          onChange={(value) =>
+                                            handleTaxChange(value, index)
+                                          }
+                                          className={clsx(
+                                            el?.taxError && "border-red"
+                                          )}
+                                        />
+                                      </div>
+                                      <input
+                                        type="text"
+                                        className={clsx(
+                                          "form-control form-control-solid text-end ms-3 me-1 px-2 py-2",
+                                          el?.taxCountError && "border-red"
+                                        )}
+                                        name="price"
+                                        placeholder="0"
+                                        data-kt-element="price"
+                                        id="price-input"
+                                        style={{ width: "50px" }}
+                                        maxLength={3}
+                                        value={el?.name?.tax}
+                                        disabled={!el?.enableTaxCount}
+                                        onKeyPress={(event) => {
+                                          const currentValue =
+                                            event.target.value + event.key; // Combine current value with pressed key
+                                          if (
+                                            !/^\d*\.?\d*$/.test(currentValue) ||
+                                            parseInt(currentValue) > 100
+                                          ) {
+                                            event.preventDefault();
+                                          }
+                                        }}
+                                        onFocus={(e) => {
+                                          e.target.select();
+                                        }}
+                                        onChange={(e) => {
+                                          handleTaxCountChange(e, index);
+                                        }}
+                                      />
+                                      %
+                                    </div>
+                                  );
+                                })
+                              ) : (
+                                <div>0%</div>
+                              )}
+                            </div>
                           </div>
-                          <div className="d-flex align-items-center justify-content-end">
+                          <div className="d-flex align-items-center justify-content-between">
+                            <button
+                              className="btn btn-link pe-4"
+                              data-bs-toggle="tooltip"
+                              data-bs-trigger="hover"
+                              title="Coming soon"
+                            >
+                              Discount
+                            </button>
                             {billDetails?.enableDiscount ? (
                               <div className="d-flex align-items-center">
                                 <input
@@ -838,7 +968,7 @@ const GenerateBill = () => {
                                     const currentValue =
                                       event.target.value + event.key; // Combine current value with pressed key
                                     if (
-                                      !/^\d+$/.test(currentValue) ||
+                                      !/^\d*\.?\d*$/.test(currentValue) ||
                                       parseInt(currentValue) > 100
                                     ) {
                                       event.preventDefault();
@@ -858,7 +988,7 @@ const GenerateBill = () => {
                                 %
                               </div>
                             ) : (
-                              <div className="my-3">0%</div>
+                              <div>0%</div>
                             )}
                           </div>
                         </th>
@@ -876,19 +1006,28 @@ const GenerateBill = () => {
                               product.forEach((el) => {
                                 total += parseFloat(el.total);
                               });
-                              if (
-                                billDetails?.enableTax &&
-                                billDetails?.addTax?.tax
-                              ) {
-                                total +=
-                                  total *
-                                  (Number(billDetails?.addTax?.tax) / 100);
+                              let totalTax = 0;
+                              if (billDetails?.taxFields?.length) {
+                                billDetails?.taxFields.forEach((el) => {
+                                  if (el?.name && el?.name?.tax != 0) {
+                                    totalTax +=
+                                      (parseFloat(total) *
+                                        parseFloat(el?.name?.tax)) /
+                                      100;
+                                  }
+                                });
                               }
-                              if (billDetails?.enableDiscount) {
+                              total += totalTax; // Add totalTax to total outside the loop
+                              total = Math.floor(total);
+                              if (
+                                billDetails?.enableDiscount &&
+                                billDetails?.addDiscount
+                              ) {
                                 total =
                                   total -
                                   total *
-                                    (Number(billDetails?.addDiscount) / 100);
+                                    (parseFloat(billDetails?.addDiscount) /
+                                      100);
                               }
                               console.log("============", billDetails);
                               return parseFloat(total.toFixed(2));
@@ -904,7 +1043,10 @@ const GenerateBill = () => {
           </div>
         </div>
         <div className="col-3">
-          <div className="card w-100 sticky-top" style={{ top: "97px" }}>
+          <div
+            className="card w-100 sticky-top"
+            style={{ top: "97px", zIndex: 1 }}
+          >
             <div class="card-body p-10">
               <div class="mb-10">
                 <Select
@@ -935,7 +1077,7 @@ const GenerateBill = () => {
                     Add Tax
                   </span>
                   <input
-                    class="form-check-input"
+                    className="form-check-input cursor-pointer"
                     type="checkbox"
                     name="enableTax"
                     value={billDetails?.enableTax}
@@ -948,7 +1090,7 @@ const GenerateBill = () => {
                     Add Discount
                   </span>
                   <input
-                    class="form-check-input"
+                    className="form-check-input cursor-pointer"
                     type="checkbox"
                     name="enableDiscount"
                     value={billDetails?.enableDiscount}
