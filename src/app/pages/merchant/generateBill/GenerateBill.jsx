@@ -575,7 +575,7 @@ const GenerateBill = () => {
                       <input
                         type="text"
                         className="form-control form-control-solid"
-                        placeholder="Name*"
+                        placeholder="Full Name*"
                         name="name"
                         value={billDetails?.name}
                         onChange={handleBillDetailsChange}

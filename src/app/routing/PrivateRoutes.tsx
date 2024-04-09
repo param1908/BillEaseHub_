@@ -7,10 +7,13 @@ import { WithChildren } from "../../_metronic/helpers";
 import { routeList } from "./RouteList";
 import { ProtectedRoute } from "./protectedRoute";
 import MainLayout from "../mainLayout/MainLayout";
+import { useSelector } from "react-redux";
 
 const PrivateRoutes = () => {
   const ProfilePage = lazy(() => import("../modules/profile/ProfilePage"));
   const AccountPage = lazy(() => import("../modules/accounts/AccountPage"));
+
+  const role = localStorage.getItem("role");
 
   return (
     <Routes>
@@ -92,7 +95,18 @@ const PrivateRoutes = () => {
             />
           );
         })}
-        <Route path="*" element={<Navigate to="/auth/login" />} />
+        <Route
+          path="*"
+          element={
+            role === "C" ? (
+              <Navigate to="/customer/dashboard" />
+            ) : role === "M" ? (
+              <Navigate to="/merchant/dashboard" />
+            ) : (
+              <Navigate to="/auth/login" />
+            )
+          }
+        />
       </Route>
     </Routes>
   );
