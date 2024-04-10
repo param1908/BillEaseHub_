@@ -7,6 +7,7 @@ import Category from "../pages/merchant/category/Category";
 import Product from "../pages/merchant/product/Product";
 import Tax from "../pages/merchant/tax/Tax";
 import GenerateBill from "../pages/merchant/generateBill/GenerateBill";
+import ProfilePage from "../pages/merchant/profile/ProfilePage";
 const { customer, merchant, admin } = UserRoles;
 const { BEFORE_AUTH, AFTER_AUTH, DEFAULT } = LayoutTypes;
 
@@ -72,16 +73,16 @@ export const routeList = [
     isAuthRequired: true,
     accessRoles: [merchant],
   },
-    {
-      id: "CUST_05",
-      icon: "",
-      path: "/merchant/generate-invoice",
-      name: "Generate Bill",
-      element: <GenerateBill />,
-      layoutType: AFTER_AUTH,
-      isAuthRequired: true,
-      accessRoles: [merchant],
-    },
+  {
+    id: "CUST_05",
+    icon: "",
+    path: "/merchant/generate-invoice",
+    name: "Generate Bill",
+    element: <GenerateBill />,
+    layoutType: AFTER_AUTH,
+    isAuthRequired: true,
+    accessRoles: [merchant],
+  },
   //   {
   //     id: "CUST_06",
   //     icon: "",
@@ -152,4 +153,14 @@ export const routeList = [
     isAuthRequired: true,
     accessRoles: [merchant],
   },
+  // {
+  //   id: "CUST_13",
+  //   icon: "",
+  //   path: "/merchant/profile",
+  //   name: "Profile",
+  //   element: <ProfilePage />,
+  //   layoutType: AFTER_AUTH,
+  //   isAuthRequired: true,
+  //   accessRoles: [merchant],
+  // },
 ];

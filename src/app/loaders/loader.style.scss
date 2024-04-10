@@ -1,0 +1,70 @@
+// Loader Styles !Required!
+$spinner_speed: 0.675s;
+$spinner_radius: 80%;
+$spinner_fill_radius: 90px;
+
+$spinner_size: 50px;
+$spinner_thickness: 10px;
+$spinner_inner_circle: $spinner_size - $spinner_thickness;
+
+$spinner_color: #223c59;
+$spinner_bg: #3e97ff;
+$spinner_inner_bg: #3e97ff;
+
+.loader-wrap {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 99999999999999999;
+  background-color: #c1b7b747;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spin-loader {
+  border-radius: 80%;
+  display: block;
+  height: $spinner_size;
+  width: $spinner_size;
+  position: relative;
+  animation: spin $spinner_speed linear 0s infinite normal;
+  background: $spinner_bg;
+
+  &:before,
+  &:after {
+    content: "";
+    display: block;
+    position: absolute;
+  }
+
+  &:before {
+    border-radius: 0 $spinner_fill_radius $spinner_fill_radius 0;
+    height: $spinner_size;
+    width: 50%;
+    top: 0;
+    right: 0;
+    z-index: 1;
+    background: $spinner_color;
+    background-image: linear-gradient($spinner_bg, $spinner_color);
+  }
+
+  &:after {
+    border-radius: $spinner_radius;
+    height: $spinner_inner_circle;
+    width: $spinner_inner_circle;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    background: $spinner_inner_bg;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -10,7 +10,9 @@ import MainLayout from "../mainLayout/MainLayout";
 import { useSelector } from "react-redux";
 
 const PrivateRoutes = () => {
-  const ProfilePage = lazy(() => import("../modules/profile/ProfilePage"));
+  const ProfilePage = lazy(
+    () => import("../pages/merchant/profile/ProfilePage")
+  );
   const AccountPage = lazy(() => import("../modules/accounts/AccountPage"));
 
   const role = localStorage.getItem("role");
@@ -18,12 +20,20 @@ const PrivateRoutes = () => {
   return (
     <Routes>
       <Route element={<MasterLayout />}>
+        <Route
+          path="/merchant/profile/*"
+          element={
+            <SuspensedView>
+              <ProfilePage />
+            </SuspensedView>
+          }
+        />
         {/* <Route path='auth/*' element={<Navigate to='/dashboard' />} />
         <Route path='dashboard' element={<DashboardWrapper />} />
         <Route path='builder' element={<BuilderPageWrapper />} />
         <Route path='menu-test' element={<MenuTestPage />} />
         <Route
-          path='crafted/pages/profile/*'
+          path='merchant/profile/*'
           element={
             <SuspensedView>
               <ProfilePage />

@@ -7,6 +7,7 @@ import {
   ThemeModeSwitcher,
 } from "../../../../_metronic/partials";
 import { useLayout } from "../../core";
+import { useSelector } from "react-redux";
 
 const itemClass = "ms-1 ms-md-4";
 const userAvatarClass = "symbol-35px";
@@ -14,6 +15,7 @@ const btnIconClass = "fs-2";
 
 const Navbar = () => {
   const { config } = useLayout();
+  const { userDetails } = useSelector((state: any) => state.user);
   return (
     <div className="app-navbar flex-shrink-0">
       <div className={clsx("app-navbar-item")}>
@@ -41,7 +43,30 @@ const Navbar = () => {
           data-kt-menu-attach="parent"
           data-kt-menu-placement="bottom-end"
         >
-          <img src={toAbsoluteUrl("/media/avatars/300-3.jpg")} alt="" />
+          <div className="symbol symbol-50px me-5">
+            {userDetails?.user?.merchantData?.logo ? (
+              <img
+                alt="Logo"
+                src={
+                  userDetails?.user?.imageUrl +
+                  userDetails?.user?.merchantData?.logo
+                }
+              />
+            ) : (
+              <div
+                className="text-uppercase d-flex justify-content-center align-items-center"
+                style={{
+                  width: "35px",
+                  height: "35px",
+                  borderRadius: "8px",
+                  backgroundColor: "#868fa7 ",
+                  color: "#f9f9f9",
+                }}
+              >
+                {userDetails?.user?.fullName[0]}
+              </div>
+            )}
+          </div>
         </div>
         <HeaderUserMenu />
       </div>

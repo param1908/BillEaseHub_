@@ -1,12 +1,24 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { FC } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../../app/modules/auth";
 import { Languages } from "./Languages";
 import { toAbsoluteUrl } from "../../../helpers";
+import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
 
 const HeaderUserMenu: FC = () => {
-  const { currentUser, logout } = useAuth();
+  const navigate = useNavigate();
+  const { userDetails } = useSelector((state: any) => state.user);
+  console.log("ud", userDetails);
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    toast.success("Logout successfully");
+    navigate("/auth/login", { replace: true });
+  };
+
   return (
     <div
       className="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg menu-state-primary fw-bold py-4 fs-6 w-275px"
@@ -15,18 +27,36 @@ const HeaderUserMenu: FC = () => {
       <div className="menu-item px-3">
         <div className="menu-content d-flex align-items-center px-3">
           <div className="symbol symbol-50px me-5">
-            <img alt="Logo" src={toAbsoluteUrl("/media/avatars/300-3.jpg")} />
+            {userDetails?.user?.merchantData?.logo ? (
+              <img
+                alt="Logo"
+                src={
+                  userDetails?.user?.imageUrl +
+                  userDetails?.user?.merchantData?.logo
+                }
+              />
+            ) : (
+              <div
+                className="text-uppercase d-flex justify-content-center align-items-center"
+                style={{
+                  width: "35px",
+                  height: "35px",
+                  borderRadius: "8px",
+                  backgroundColor: "#868fa7 ",
+                  color: "#f9f9f9",
+                }}
+              >
+                {userDetails?.user?.fullName[0]}
+              </div>
+            )}
           </div>
 
           <div className="d-flex flex-column">
-            <div className="fw-bolder d-flex align-items-center fs-5">
-              {currentUser?.first_name} {currentUser?.first_name}
-              <span className="badge badge-light-success fw-bolder fs-8 px-2 py-1 ms-2">
-                Pro
-              </span>
+            <div className="fw-bolder d-flex align-items-center fs-5 text-capitalize">
+              {userDetails?.user?.fullName}
             </div>
             <a href="#" className="fw-bold text-muted text-hover-primary fs-7">
-              {currentUser?.email}
+              {userDetails?.user?.email}
             </a>
           </div>
         </div>
@@ -35,7 +65,7 @@ const HeaderUserMenu: FC = () => {
       <div className="separator my-2"></div>
 
       <div className="menu-item px-5">
-        <Link to={"/crafted/pages/profile"} className="menu-link px-5">
+        <Link to={"/merchant/profile"} className="menu-link px-5">
           My Profile
         </Link>
       </div>

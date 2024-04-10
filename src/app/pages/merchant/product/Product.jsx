@@ -19,6 +19,7 @@ import SweetAlert from "react-bootstrap-sweetalert";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import Pagination from "react-js-pagination";
+import MainLoader from "../../../loaders/MainLoader";
 
 const Product = () => {
   const navigate = useNavigate();
@@ -166,11 +167,11 @@ const Product = () => {
   });
 
   useEffect(() => {
+    !search && setLoading(true);
     getAllProducts();
   }, [search, catId, paginate]);
 
   const getAllProducts = async () => {
-    setLoading(true);
     try {
       let payload = {
         ...paginate,
@@ -184,11 +185,12 @@ const Product = () => {
       }
       if (searchValue) payload = { ...payload, categoryId: searchValue };
       if (search) payload = { ...payload, search };
-      const categoryData = await getAllProductsApi(payload);
-      setProducts(categoryData?.data?.productDetails);
-      setTotal(categoryData?.data?.total);
-      console.log("product", categoryData);
+      const productData = await getAllProductsApi(payload);
+      setProducts(productData?.data?.productDetails);
+      setTotal(productData?.data?.total);
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       console.log("err", error);
     }
   };
@@ -770,6 +772,7 @@ const Product = () => {
           }
         ></SweetAlert>
       )}
+      {loading && <MainLoader />}
     </>
   );
 };

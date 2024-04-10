@@ -16,6 +16,7 @@ import {
 import SweetAlert from "react-bootstrap-sweetalert";
 import { useNavigate } from "react-router-dom";
 import Pagination from "react-js-pagination";
+import MainLoader from "../../../loaders/MainLoader";
 
 const Category = () => {
   const [showModal, setShowModal] = useState(false);
@@ -123,6 +124,7 @@ const Category = () => {
   });
 
   useEffect(() => {
+    !search && setLoading(true);
     getAllCategories();
   }, [search, paginate]);
 
@@ -136,7 +138,9 @@ const Category = () => {
       const categoryData = await getAllCategoriesApi(payload);
       setCategories(categoryData?.data?.categoryDetails);
       setTotal(categoryData?.data?.total);
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       console.log("err", error);
     }
   };
@@ -555,6 +559,7 @@ const Category = () => {
           }
         ></SweetAlert>
       )}
+      {loading && <MainLoader />}
     </>
   );
 };

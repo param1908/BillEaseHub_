@@ -1,5 +1,5 @@
 import { Navigate, Routes, Route, Outlet } from "react-router-dom";
-import { PageLink, PageTitle } from "../../layout/core";
+import { PageLink, PageTitle } from "../../../layout/core";
 import { Overview } from "./components/Overview";
 import { Projects } from "./components/Projects";
 import { Campaigns } from "./components/Campaigns";
@@ -10,7 +10,7 @@ import { ProfileHeader } from "./ProfileHeader";
 const profileBreadCrumbs: Array<PageLink> = [
   {
     title: "Profile",
-    path: "/crafted/pages/profile/overview",
+    path: "/merchant/profile/overview",
     isSeparator: false,
     isActive: false,
   },
@@ -77,10 +77,7 @@ const ProfilePage = () => (
           </>
         }
       />
-      <Route
-        index
-        element={<Navigate to="/crafted/pages/profile/overview" />}
-      />
+      <Route index element={<Navigate to="/merchant/profile/overview" />} />
     </Route>
   </Routes>
 );

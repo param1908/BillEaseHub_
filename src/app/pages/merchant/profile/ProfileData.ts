@@ -1,36 +1,36 @@
-import { PageLink } from "../../layout/core";
+import { PageLink } from "../../../layout/core";
 
 export const profileSubmenu: Array<PageLink> = [
   {
     title: "Overview",
-    path: "/crafted/pages/profile/overview",
+    path: "/merchant/profile/overview",
     isActive: true,
   },
   {
     title: "Separator",
-    path: "/crafted/pages/profile/overview",
+    path: "/merchant/profile/overview",
     isActive: true,
     isSeparator: true,
   },
   {
     title: "Account",
-    path: "/crafted/pages/profile/account",
+    path: "/merchant/profile/account",
     isActive: false,
   },
   {
     title: "Account",
-    path: "/crafted/pages/profile/account",
+    path: "/merchant/profile/account",
     isActive: false,
     isSeparator: true,
   },
   {
     title: "Settings",
-    path: "/crafted/pages/profile/settings",
+    path: "/merchant/profile/settings",
     isActive: false,
   },
   {
     title: "Settings",
-    path: "/crafted/pages/profile/settings",
+    path: "/merchant/profile/settings",
     isActive: false,
     isSeparator: true,
   },

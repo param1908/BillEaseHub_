@@ -17,6 +17,7 @@ import {
   ListsWidget26,
   EngageWidget10,
 } from "../../../../_metronic/partials/widgets";
+import MainLoader from "../../../loaders/MainLoader";
 
 const DashboardPage: FC = () => (
   <>
