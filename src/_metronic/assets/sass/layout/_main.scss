@@ -28,5 +28,12 @@
 .border-red {
   border: 1px solid;
   border-radius: 4px;
-  border-color: red !important;
+  border-color: var(--bs-form-invalid-border-color) !important;
+}
+
+.close-btn {
+  position: absolute;
+  top: 8px;
+  right: 51px;
+  z-index: 1;
 }

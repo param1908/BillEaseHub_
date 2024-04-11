@@ -33,7 +33,7 @@ export const ProtectedRoute = ({
   }
 
   if (token && role) {
-    if (location?.pathname.includes("/customer") && role !== "C") {
+    if (location?.pathname.includes("/customer/") && role !== "C") {
       localStorage.clear();
       return (
         <>

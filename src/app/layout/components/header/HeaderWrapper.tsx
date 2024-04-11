@@ -5,15 +5,22 @@ import { KTIcon, toAbsoluteUrl } from "../../../../_metronic/helpers";
 import { useLayout } from "../../core";
 import { Header } from "./Header";
 import { Navbar } from "./Navbar";
+import { useSelector } from "react-redux";
+import { UserDetails } from "../../../models/common.model";
 
 export function HeaderWrapper() {
   const { config, classes } = useLayout();
+  const { userDetails } = useSelector((state: UserDetails) => state?.user);
   if (!config.app?.header?.display) {
     return null;
   }
 
   return (
-    <div id="kt_app_header" className="app-header">
+    <div
+      id="kt_app_header"
+      className="app-header"
+      style={userDetails?.user?.role == "C" ? { left: "0" } : { zIndex: "100" }}
+    >
       <div
         id="kt_app_header_container"
         className={clsx(

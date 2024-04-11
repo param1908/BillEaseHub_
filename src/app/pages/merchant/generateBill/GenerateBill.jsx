@@ -574,7 +574,10 @@ const GenerateBill = () => {
                     <div className="mb-5">
                       <input
                         type="text"
-                        className="form-control form-control-solid"
+                        className={clsx(
+                          "form-control form-control-solid",
+                          errorMessages?.nameError && "is-invalid"
+                        )}
                         placeholder="Full Name*"
                         name="name"
                         value={billDetails?.name}
@@ -591,7 +594,10 @@ const GenerateBill = () => {
                     <div className="mb-5">
                       <input
                         type="text"
-                        className="form-control form-control-solid"
+                        className={clsx(
+                          "form-control form-control-solid",
+                          errorMessages?.phoneError && "is-invalid"
+                        )}
                         placeholder="Phone*"
                         name="phone"
                         maxLength={10}
@@ -816,32 +822,34 @@ const GenerateBill = () => {
                               </span>
                             </div>
                           </div>
-                          {billDetails?.enableTax && (
-                            <div className="d-flex align-items-center justify-content-end">
-                              <button
-                                className="btn btn-sm btn-primary fs-6 py-0 px-2 ms-2"
-                                data-kt-element="add-item"
-                                onClick={handleAddTax}
-                              >
-                                +
-                              </button>
-                            </div>
-                          )}
 
                           <div className="d-flex align-items-center justify-content-between mb-3">
-                            <button
-                              className="btn btn-link pe-4 d-flex align-items-center"
-                              data-bs-toggle="tooltip"
-                              data-bs-trigger="hover"
-                              title="Coming soon"
-                            >
-                              <span>Tax </span>
-                            </button>
+                            <div className="d-flex align-items-center">
+                              <button
+                                className="btn btn-link pe-4 d-flex align-items-center"
+                                data-bs-toggle="tooltip"
+                                data-bs-trigger="hover"
+                                title="Coming soon"
+                              >
+                                <span>Tax </span>
+                              </button>
+                              {billDetails?.enableTax && (
+                                <div className="d-flex align-items-center justify-content-end me-1 ms-2">
+                                  <button
+                                    className="btn btn-sm btn-light-primary border fs-6 py-1 px-2 ms-2"
+                                    data-kt-element="add-item"
+                                    onClick={handleAddTax}
+                                  >
+                                    + Add More
+                                  </button>
+                                </div>
+                              )}
+                            </div>
                             <div>
                               {billDetails?.enableTax ? (
                                 billDetails?.taxFields?.map((el, index) => {
                                   return (
-                                    <div className="d-flex align-items-center justify-content-end mt-1">
+                                    <div className="d-flex align-items-center justify-content-end">
                                       <button
                                         type="button"
                                         className="btn btn-sm btn-icon btn-active-color-primary cursor-pointer"
@@ -887,7 +895,12 @@ const GenerateBill = () => {
                                           </svg>
                                         </span>
                                       </button>
-                                      <div style={{ minWidth: "130px" }}>
+                                      <div
+                                        style={{
+                                          minWidth: "130px",
+                                          maxWidth: "145px",
+                                        }}
+                                      >
                                         <CreatableSelect
                                           options={taxOptions}
                                           placeholder={"Select Tax"}
@@ -1058,6 +1071,9 @@ const GenerateBill = () => {
                   onChange={(option) => {
                     handleBillDetailsChange(option, "paymentMethod");
                   }}
+                  className={clsx(
+                    errorMessages?.paymentMethodError && "border-red"
+                  )}
                   maxMenuHeight={150}
                 />
                 {errorMessages?.paymentMethodError && (

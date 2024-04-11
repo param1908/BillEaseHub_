@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { HeaderWrapper } from "./components/header";
-import { RightToolbar } from "../../_metronic/partials/layout/RightToolbar";
 import { ScrollTop } from "./components/scroll-top";
 import { Content } from "./components/content";
 import {
@@ -57,7 +56,7 @@ const MasterLayout = () => {
                 className="app-wrapper flex-column flex-row-fluid"
                 id="kt_app_wrapper"
               >
-                <Sidebar />
+                {userDetails?.user?.role == "M" && <Sidebar />}
                 <div
                   className="app-main flex-column flex-row-fluid"
                   id="kt_app_main"
@@ -76,7 +75,6 @@ const MasterLayout = () => {
 
           {/* begin:: Drawers */}
           <ActivityDrawer />
-          <RightToolbar />
           {/* end:: Drawers */}
 
           {/* begin:: Modals */}

@@ -75,3 +75,7 @@
   border-color: var(--bs-gray-300);
   opacity: 1;
 }
+.was-validated .form-control:invalid,
+.form-control.is-invalid {
+  border-color: var(--bs-form-invalid-border-color) !important;
+}

@@ -562,7 +562,7 @@ const Product = () => {
                   <div>
                     <div className="fv-row mb-8">
                       <input
-                        placeholder="Category Name"
+                        placeholder="Product Name"
                         {...formik.getFieldProps("name")}
                         className={clsx(
                           "form-control bg-transparent",
