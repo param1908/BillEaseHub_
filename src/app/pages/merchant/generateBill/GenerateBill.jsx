@@ -57,6 +57,7 @@ const GenerateBill = () => {
   const [errorMessages, setErrorMessages] = useState({});
   const [product, setProduct] = useState([productObj]);
   const [billDetails, setBillDetails] = useState(billObj);
+  const [billCount, setBillCount] = useState("0000");
 
   useEffect(() => {
     // Initialize Flatpickr
@@ -137,6 +138,14 @@ const GenerateBill = () => {
     }
   };
 
+  function formatNumberWithLeadingZeros(number) {
+    let numberString = number.toString();
+    while (numberString.length < 4) {
+      numberString = "0" + numberString;
+    }
+    return numberString;
+  }
+
   const getCategoryData = async () => {
     try {
       const categoryData = await getAllCategoriesApi();
@@ -144,6 +153,9 @@ const GenerateBill = () => {
         return { value: el._id, label: el.name };
       });
       setCategoryOptions(catData);
+      setBillCount(
+        formatNumberWithLeadingZeros(categoryData?.data?.totalBills)
+      );
     } catch (error) {
       console.log("err", error);
     }
@@ -521,7 +533,7 @@ const GenerateBill = () => {
                   <input
                     type="text"
                     className="form-control form-control-flush fw-bold text-muted fs-3 w-125px"
-                    value="00000001"
+                    value={billCount}
                     placeholder="..."
                   />
                 </div>

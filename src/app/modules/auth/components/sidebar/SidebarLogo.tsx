@@ -4,7 +4,7 @@ import { MutableRefObject, useEffect, useRef } from "react";
 import { useLayout } from "../../../../layout/core";
 import { ToggleComponent } from "../../../../../_metronic/assets/ts/components";
 import { KTIcon, toAbsoluteUrl } from "../../../../../_metronic/helpers";
-
+import BEHLogo from "../../../../beh_images/behlogo-red-white.png";
 type PropsType = {
   sidebarRef: MutableRefObject<HTMLDivElement | null>;
 };
@@ -56,19 +56,19 @@ const SidebarLogo = (props: PropsType) => {
         {config.layoutType === "dark-sidebar" ? (
           <img
             alt="Logo"
-            src={toAbsoluteUrl("/media/logos/default-dark.svg")}
+            src={BEHLogo}
             className="h-25px app-sidebar-logo-default"
           />
         ) : (
           <>
             <img
               alt="Logo"
-              src={toAbsoluteUrl("/media/logos/default.svg")}
+              src={BEHLogo}
               className="h-25px app-sidebar-logo-default theme-light-show"
             />
             <img
               alt="Logo"
-              src={toAbsoluteUrl("/media/logos/default-dark.svg")}
+              src={BEHLogo}
               className="h-25px app-sidebar-logo-default theme-dark-show"
             />
           </>
@@ -76,7 +76,7 @@ const SidebarLogo = (props: PropsType) => {
 
         <img
           alt="Logo"
-          src={toAbsoluteUrl("/media/logos/default-small.svg")}
+          src={BEHLogo}
           className="h-20px app-sidebar-logo-minimize"
         />
       </Link>

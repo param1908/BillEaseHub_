@@ -16,6 +16,7 @@ import { useSelector } from "react-redux";
 import { getUserDetailsByToken } from "../services/common.service";
 import { storeUserDetails } from "../store/slice/user.slice";
 import { UserDetails } from "../models/common.model";
+import clsx from "clsx";
 
 const MasterLayout = () => {
   const location = useLocation();
@@ -53,7 +54,10 @@ const MasterLayout = () => {
             >
               <HeaderWrapper />
               <div
-                className="app-wrapper flex-column flex-row-fluid"
+                className={clsx(
+                  "app-wrapper flex-column flex-row-fluid",
+                  userDetails?.user?.role == "C" && "ms-0"
+                )}
                 id="kt_app_wrapper"
               >
                 {userDetails?.user?.role == "M" && <Sidebar />}

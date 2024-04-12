@@ -1,9 +1,15 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { useEffect } from "react";
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, Link, useLocation } from "react-router-dom";
 import { toAbsoluteUrl } from "../../../_metronic/helpers";
+import BEHLoginVector from "../../beh_images/login-vector.png";
+import BEHSignupVector from "../../beh_images/signup-vector.png";
+import BEHLogo from "../../beh_images/behlogo-green-white.png";
 
 const AuthLayout = () => {
+  const location = useLocation();
+  console.log("location.pathname", location.pathname);
+
   useEffect(() => {
     const root = document.getElementById("root");
     if (root) {
@@ -26,16 +32,30 @@ const AuthLayout = () => {
         }}
       >
         {/* begin::Content */}
-        <div className="d-flex flex-column flex-center py-15 px-5 px-md-15 w-100">
-          {/* begin::Logo */}
-          <Link to="/" className="mb-12">
-            <img
-              alt="Logo"
-              src={toAbsoluteUrl("/media/logos/custom-1.png")}
-              className="h-75px"
-            />
-          </Link>
-          {/* end::Logo */}
+        <div className=" py-15 px-5 px-md-15 w-100">
+          <div className="w-100 mb-4">
+            <img src={BEHLogo} alt="" style={{ width: "180px" }} />
+          </div>
+
+          <div className="d-flex flex-column flex-center h-100">
+            {/* begin::Logo */}
+            <Link to="/" className="mb-12">
+              {location.pathname === "/auth/login" ? (
+                <img
+                  alt="Logo"
+                  src={BEHLoginVector}
+                  style={{ height: "430px" }}
+                />
+              ) : (
+                <img
+                  alt="Logo"
+                  src={BEHSignupVector}
+                  style={{ height: "430px" }}
+                />
+              )}
+            </Link>
+            {/* end::Logo */}
+          </div>
         </div>
         {/* end::Content */}
       </div>

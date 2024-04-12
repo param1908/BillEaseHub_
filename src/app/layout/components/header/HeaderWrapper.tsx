@@ -7,6 +7,7 @@ import { Header } from "./Header";
 import { Navbar } from "./Navbar";
 import { useSelector } from "react-redux";
 import { UserDetails } from "../../../models/common.model";
+import BEHLogo from "../../../beh_images/behlogo-red.png";
 
 export function HeaderWrapper() {
   const { config, classes } = useLayout();
@@ -43,11 +44,7 @@ export function HeaderWrapper() {
               </div>
               <div className="d-flex align-items-center flex-grow-1 flex-lg-grow-0">
                 <Link to="/merchant/dashboard" className="d-lg-none">
-                  <img
-                    alt="Logo"
-                    src={toAbsoluteUrl("/media/logos/default-small.svg")}
-                    className="h-30px"
-                  />
+                  <img alt="Logo" src={BEHLogo} className="h-30px" />
                 </Link>
               </div>
             </div>
