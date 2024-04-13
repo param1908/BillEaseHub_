@@ -11,6 +11,7 @@ import {
 import clsx from "clsx";
 import { omit } from "lodash";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const GenerateBill = () => {
   const productObj = {
@@ -58,6 +59,7 @@ const GenerateBill = () => {
   const [product, setProduct] = useState([productObj]);
   const [billDetails, setBillDetails] = useState(billObj);
   const [billCount, setBillCount] = useState("0000");
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Initialize Flatpickr
@@ -360,6 +362,7 @@ const GenerateBill = () => {
         products: productPayload,
       };
       console.log("success", prepareObject);
+      navigate("/merchant/bill-templates");
     } else {
       let err = { ...billDetails };
       billDetails.taxFields.forEach((data) => {
@@ -511,7 +514,7 @@ const GenerateBill = () => {
   return (
     <>
       <div className="row w-100">
-        <div className="col-9 h-auto">
+        <div className="col-12 col-lg-9 h-auto">
           <div className="card">
             <div className="card-body p-12">
               <div className="d-flex flex-column align-items-start flex-xxl-row">
@@ -690,6 +693,7 @@ const GenerateBill = () => {
                               <div className="row">
                                 <div className="col-6">
                                   <CreatableSelect
+                                    isClearable={true}
                                     options={categoryOptions}
                                     placeholder={"Select Category"}
                                     onChange={(value) => {
@@ -704,6 +708,7 @@ const GenerateBill = () => {
                                 </div>
                                 <div className="col-6">
                                   <CreatableSelect
+                                    isClearable={true}
                                     options={productOptions}
                                     placeholder={"Select Product"}
                                     isDisabled={el?.disableProd}
@@ -1067,7 +1072,7 @@ const GenerateBill = () => {
             </div>
           </div>
         </div>
-        <div className="col-3">
+        <div className="col-12 col-lg-3">
           <div
             className="card w-100 sticky-top"
             style={{ top: "97px", zIndex: 1 }}
