@@ -2,12 +2,65 @@ import React, { useState } from "react";
 import Template1 from "./Template1";
 import Template2 from "./Template2";
 import Template3 from "./Template3";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { createBillTemplateApi } from "../../../services/merchant.service";
+import { toast } from "react-toastify";
 
 const BillTemplates = () => {
   const location = useLocation();
   const data = location.state;
+  const navigate = useNavigate();
   const [selectedTemplate, setSelectedTemplate] = useState("Template1");
+
+  const sendInvoice = async () => {
+    try {
+      console.log("sendInvoice", data);
+      const prepareObject = {
+        email: data.email,
+        phone: data?.phone,
+        name: data?.name,
+        paymentMethod: data?.paymentMethod?.label,
+        discount: Number(data?.addDiscount),
+        subTotal: Number(data?.subTotalCount),
+        total: Number(data?.total),
+        notes: data?.notes,
+        templateId: selectedTemplate,
+        billDate: data?.invoiceDate,
+        discountCount: Number(data?.discountCount),
+        products: [],
+        taxFields: [],
+      };
+      if (data?.products?.length) {
+        data?.products?.forEach((el) => {
+          prepareObject.products.push({
+            categoryName: el?.category?.label,
+            productName: el?.product?.label,
+            productquantity: Number(el?.quantity),
+            productprice: Number(el?.price),
+            productTotal: Number(el?.total),
+          });
+        });
+      }
+      if (data?.taxFields?.length) {
+        data?.taxFields?.forEach((el) => {
+          prepareObject.taxFields.push({
+            taxName: el?.name?.label,
+            value: Number(el?.name?.tax),
+            totalTaxCount: Number(el?.totalTaxCount),
+          });
+        });
+      }
+      console.log("prepareObj", prepareObject);
+      let response = await createBillTemplateApi(prepareObject);
+      if (response["ResponseCode"] == 1) {
+        toast.success(response?.message);
+        navigate("/merchant/generate-invoice");
+      }
+      if (data.email) prepareObject.email = data.email;
+    } catch (error) {
+      console.log("err", error);
+    }
+  };
 
   return (
     <>
@@ -28,7 +81,10 @@ const BillTemplates = () => {
           </div>
         </div>
         <div className="col-12 col-lg-3">
-          <div className="card">
+          <div
+            className="card w-100 sticky-top"
+            style={{ top: "97px", zIndex: 1 }}
+          >
             <div className="card-body p-10">
               <div className="d-flex flex-column">
                 <h3 className="card-title mb-5 text-gray-900 fw-bold fs-3">
@@ -98,7 +154,10 @@ const BillTemplates = () => {
                   </li>
                 </ul>
                 <div className="separator separator-dashed mt-3 mb-8"></div>
-                <a href="#" className="btn btn-primary mb-4 p-3">
+                <a
+                  className="btn btn-primary mb-4 p-3 cursor-pointer"
+                  onClick={() => sendInvoice()}
+                >
                   <span className="svg-icon svg-icon-3 me-3">
                     <svg
                       width="24"
@@ -122,8 +181,8 @@ const BillTemplates = () => {
                 </a>
 
                 <a
-                  href="#"
-                  className="btn btn-secondary btn-color-gray-700 p-3"
+                  className="btn btn-secondary btn-color-gray-700 p-3 cursor-pointer"
+                  onClick={() => navigate("/merchant/generate-invoice")}
                 >
                   Cancel
                 </a>

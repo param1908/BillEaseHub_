@@ -1,8 +1,11 @@
 import { axiosApi } from "../../Axios.api";
 
-export const createBillTemplateApi = async (url, payload) => {
+export const createBillTemplateApi = async (payload) => {
   try {
-    const userResponse = await axiosApi.post(url, payload);
+    const userResponse = await axiosApi.post(
+      "/v1/merchant/create-bill-template",
+      payload
+    );
     return userResponse?.data;
   } catch (error) {
     throw error;

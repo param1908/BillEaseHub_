@@ -48,7 +48,7 @@ const GenerateBill = () => {
     addDiscount: null,
     // taxError: false,
     discError: false,
-    taxFields: [{ ...taxObj }],
+    taxFields: [],
   };
   const invoiceDateRef = useRef(null);
   const navigate = useNavigate();
@@ -87,7 +87,11 @@ const GenerateBill = () => {
       }
       if (e.target.name === "enableTax") {
         billDetails.taxError = false;
-        billDetails.taxFields = [{ ...taxObj }];
+        if (e.target.checked) {
+          billDetails.taxFields = [{ ...taxObj }];
+        } else {
+          billDetails.taxFields = [];
+        }
       } else {
         billDetails.discError = false;
       }
@@ -152,13 +156,17 @@ const GenerateBill = () => {
 
   const getCategoryData = async () => {
     try {
-      const categoryData = await getAllCategoriesApi();
+      const payload = {
+        page: 1,
+        limit: 500000,
+      };
+      const categoryData = await getAllCategoriesApi(payload);
       let catData = categoryData?.data?.categoryDetails.map((el) => {
         return { value: el._id, label: el.name };
       });
       setCategoryOptions(catData);
       setBillCount(
-        formatNumberWithLeadingZeros(categoryData?.data?.totalBills)
+        formatNumberWithLeadingZeros(categoryData?.data?.totalBills + 1)
       );
     } catch (error) {
       console.log("err", error);
@@ -199,7 +207,6 @@ const GenerateBill = () => {
           categoryId: option?.value,
           page: 1,
           limit: 500000,
-          status: "Active",
         };
         const response = await getAllProductsApi(payload);
         let produstDetail = response?.data?.productDetails.map((el) => {

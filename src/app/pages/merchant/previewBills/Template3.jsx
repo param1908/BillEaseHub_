@@ -193,23 +193,29 @@ const Template3 = (props) => {
                             </div>
                           </td>
                           <td className="text-end">
-                            {templateData?.taxFields.map((el) => {
-                              return (
-                                <>
-                                  <div className="mb-2">
-                                    ₹{el?.totalTaxCount}
-                                  </div>
-                                </>
-                              );
-                            })}
+                            {templateData?.taxFields?.length ? (
+                              templateData?.taxFields.map((el) => {
+                                return (
+                                  <>
+                                    <div className="mb-2">
+                                      ₹{el?.totalTaxCount}
+                                    </div>
+                                  </>
+                                );
+                              })
+                            ) : (
+                              <div className="d-flex justify-content-end mb-1">
+                                ₹ 0
+                              </div>
+                            )}
                           </td>
                         </tr>
                         <tr>
                           <td colspan="3" className="text-end">
-                            Discount ({templateData?.addDiscount}%)
+                            Discount ({templateData?.addDiscount || 0}%)
                           </td>
                           <td className="text-end">
-                            ₹{templateData?.discountCount}
+                            ₹{templateData?.discountCount || 0}
                           </td>
                         </tr>
                         <tr>

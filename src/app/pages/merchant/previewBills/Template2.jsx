@@ -189,30 +189,38 @@ const Template2 = (props) => {
                           TAX
                         </div>
                         <div className="ps-2">
-                          {templateData?.taxFields.map((el) => {
-                            return (
-                              <div className="d-flex flex-stack mb-1">
-                                <div className="fw-semibold pe-17 text-gray-600 fs-7">
-                                  {"(" +
-                                    el?.name?.label +
-                                    " " +
-                                    el?.name?.tax +
-                                    "%)"}
+                          {templateData?.taxFields?.length ? (
+                            templateData?.taxFields.map((el) => {
+                              return (
+                                <div className="d-flex flex-stack mb-1">
+                                  <div className="fw-semibold pe-17 text-gray-600 fs-7">
+                                    {"(" +
+                                      el?.name?.label +
+                                      " " +
+                                      el?.name?.tax +
+                                      "%)"}
+                                  </div>
+                                  <div className="text-end fw-bold fs-6 text-gray-800">
+                                    ₹ {el?.totalTaxCount}
+                                  </div>
                                 </div>
-                                <div className="text-end fw-bold fs-6 text-gray-800">
-                                  ₹ {el?.totalTaxCount}
-                                </div>
+                              );
+                            })
+                          ) : (
+                            <div className="d-flex flex-stack mb-1">
+                              <div className="text-end fw-bold fs-6 text-gray-800">
+                                ₹ 0
                               </div>
-                            );
-                          })}
+                            </div>
+                          )}
                         </div>
                       </div>
                       <div className="d-flex flex-stack mb-3">
                         <div className="fw-semibold pe-10 text-gray-600 fs-7">
-                          Discount ({templateData?.addDiscount}%)
+                          Discount ({templateData?.addDiscount || 0}%)
                         </div>
                         <div className="text-end fw-bold fs-6 text-gray-800">
-                          ₹ {templateData?.discountCount}
+                          ₹ {templateData?.discountCount || 0}
                         </div>
                       </div>
                     </div>
