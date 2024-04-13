@@ -20,6 +20,7 @@ import { useSelector } from "react-redux";
 import { getUserDetailsByToken } from "../../../services/common.service";
 import { useDispatch } from "react-redux";
 import { storeUserDetails } from "../../../store/slice/user.slice";
+import MainLoader from "../../../loaders/MainLoader";
 
 const Tax = () => {
   const navigate = useNavigate();
@@ -101,11 +102,11 @@ const Tax = () => {
   });
 
   useEffect(() => {
+    !search && setLoading(true);
     getAllTax();
   }, [search, catId, paginate]);
 
   const getAllTax = async () => {
-    setLoading(true);
     try {
       let payload = {
         ...paginate,
@@ -115,8 +116,9 @@ const Tax = () => {
       const categoryData = await getAllTaxApi(payload);
       setTax(categoryData?.data?.taxDetails);
       setTotal(categoryData?.data?.total);
-      console.log("product", categoryData);
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       console.log("err", error);
     }
   };
@@ -571,6 +573,7 @@ const Tax = () => {
           }
         ></SweetAlert>
       )}
+      {loading && <MainLoader />}
     </>
   );
 };

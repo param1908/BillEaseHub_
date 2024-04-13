@@ -513,8 +513,8 @@ const GenerateBill = () => {
 
   return (
     <>
-      <div className="row w-100">
-        <div className="col-12 col-lg-9 h-auto">
+      <div className="row">
+        <div className="col-9 h-auto">
           <div className="card">
             <div className="card-body p-12">
               <div className="d-flex flex-column align-items-start flex-xxl-row">
