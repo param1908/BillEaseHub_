@@ -39,7 +39,7 @@ const GenerateBill = () => {
     phone: null,
     email: "",
     notes: "",
-    invoiceDate: "",
+    invoiceDate: moment().format("DD/MM/YYYY"),
     paymentMethod: null,
     enableTax: false,
     enableDiscount: false,
@@ -51,6 +51,7 @@ const GenerateBill = () => {
     taxFields: [{ ...taxObj }],
   };
   const invoiceDateRef = useRef(null);
+  const navigate = useNavigate();
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [productOptions, setProductOptions] = useState([]);
@@ -59,7 +60,6 @@ const GenerateBill = () => {
   const [product, setProduct] = useState([productObj]);
   const [billDetails, setBillDetails] = useState(billObj);
   const [billCount, setBillCount] = useState("0000");
-  const navigate = useNavigate();
 
   useEffect(() => {
     // Initialize Flatpickr
@@ -85,13 +85,15 @@ const GenerateBill = () => {
       } else {
         billDetails.enableTaxCount = false;
       }
-      e.target.name === "enableTax"
-        ? (billDetails.taxError = false)
-        : (billDetails.discError = false);
+      if (e.target.name === "enableTax") {
+        billDetails.taxError = false;
+        billDetails.taxFields = [{ ...taxObj }];
+      } else {
+        billDetails.discError = false;
+      }
       setBillDetails({
         ...billDetails,
         [e.target.name]: e.target.checked,
-        taxFields: [{ ...taxObj }],
         addDiscount: null,
       });
       return;
@@ -360,9 +362,40 @@ const GenerateBill = () => {
       let prepareObject = {
         ...billPayload,
         products: productPayload,
+        billCount,
       };
+      let total = 0;
+      productPayload.forEach((el) => {
+        total += parseFloat(el.total);
+      });
+      prepareObject.subTotalCount = JSON.parse(
+        JSON.stringify(Math.floor(total))
+      );
+      let totalTax = 0;
+      if (billDetails?.taxFields?.length) {
+        billDetails?.taxFields.forEach((el) => {
+          if (el?.name && el?.name?.tax != 0) {
+            totalTax += (parseFloat(total) * parseFloat(el?.name?.tax)) / 100;
+          }
+          el.totalTaxCount = JSON.parse(
+            JSON.stringify(
+              Math.floor((parseFloat(total) * parseFloat(el?.name?.tax)) / 100)
+            )
+          );
+        });
+      }
+      total += totalTax;
+      if (billDetails?.enableDiscount && billDetails?.addDiscount) {
+        total = total - total * (parseFloat(billDetails?.addDiscount) / 100);
+      }
+      prepareObject.discountCount = JSON.parse(
+        JSON.stringify(total * (parseFloat(billDetails?.addDiscount) / 100))
+      );
+      prepareObject.total = JSON.parse(
+        JSON.stringify(parseFloat(total.toFixed(2)))
+      );
       console.log("success", prepareObject);
-      navigate("/merchant/bill-templates");
+      navigate("/merchant/bill-templates", { state: prepareObject });
     } else {
       let err = { ...billDetails };
       billDetails.taxFields.forEach((data) => {
@@ -866,7 +899,7 @@ const GenerateBill = () => {
                               {billDetails?.enableTax ? (
                                 billDetails?.taxFields?.map((el, index) => {
                                   return (
-                                    <div className="d-flex align-items-center justify-content-end">
+                                    <div className="d-flex align-items-center justify-content-end tax-field">
                                       <button
                                         type="button"
                                         className="btn btn-sm btn-icon btn-active-color-primary cursor-pointer"
@@ -1160,7 +1193,7 @@ const GenerateBill = () => {
                       />
                     </svg>
                   </span>
-                  Send Invoice
+                  Preview
                 </button>
               </div>
             </div>

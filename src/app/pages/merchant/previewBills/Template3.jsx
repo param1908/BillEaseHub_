@@ -1,6 +1,11 @@
+import clsx from "clsx";
 import React from "react";
+import { useSelector } from "react-redux";
 
-const Template3 = () => {
+const Template3 = (props) => {
+  const templateData = props.templateData;
+  const { userDetails } = useSelector((state) => state.user);
+
   return (
     <>
       <div
@@ -14,24 +19,60 @@ const Template3 = () => {
                 INVOICE
               </h4>
               <div className="text-sm-end">
-                <a href="#" className="d-block mw-150px ms-sm-auto">
-                  <img
-                    alt="Logo"
-                    src="assets/media/svg/brand-logos/lloyds-of-london-logo.svg"
-                    className="w-100"
-                  />
-                </a>
-                <div className="text-sm-end fw-semibold fs-4 text-muted mt-7">
-                  <div>Cecilia Chapman, 711-2880 Nulla St, Mankato</div>
-                  <div>Mississippi 96522</div>
+                {userDetails?.user?.merchantData?.logo ? (
+                  <div className="d-flex justify-content-end align-items-center">
+                    <img
+                      alt="Logo"
+                      src={
+                        userDetails?.user?.imageUrl +
+                        userDetails?.user?.merchantData?.logo
+                      }
+                    />
+                  </div>
+                ) : (
+                  <div className="d-flex justify-content-end align-items-center">
+                    <div
+                      className="text-uppercase d-flex justify-content-center align-items-center fw-bold"
+                      style={{
+                        width: "35px",
+                        height: "35px",
+                        borderRadius: "8px",
+                        backgroundColor: "#868fa7 ",
+                        color: "#f9f9f9",
+                        fontSize: "19px",
+                      }}
+                    >
+                      {userDetails?.user?.fullName[0]}
+                    </div>
+                  </div>
+                )}
+                <div className="text-sm-end fw-semibold fs-4 text-muted mt-3">
+                  <div className="text-capitalize fw-bold">
+                    {userDetails?.user?.fullName}
+                  </div>
+                  <div className="text-capitalize">
+                    Address: {userDetails?.user?.merchantData?.location}
+                  </div>
+                  {userDetails?.user?.email && (
+                    <div>Email: {userDetails?.user?.email}</div>
+                  )}
+                  {userDetails?.user?.phoneNumber && (
+                    <div>Phone No: +91 {userDetails?.user?.phoneNumber}</div>
+                  )}
+                  {userDetails?.user?.merchantData?.GSTIN && (
+                    <div>GSTIN: {userDetails?.user?.merchantData?.GSTIN}</div>
+                  )}
                 </div>
               </div>
             </div>
             <div className="pb-12">
               <div className="d-flex flex-column gap-7 gap-md-10">
                 <div className="fw-bold fs-2">
-                  Dear Olivia Wild
-                  <span className="fs-6">(olivia@corpmail.com)</span>,
+                  <span className="text-capitalize">{templateData?.name}</span>
+                  {templateData?.email && (
+                    <span className="fs-6">({templateData?.email})</span>
+                  )}
+                  ,
                   <br />
                   <span className="text-muted fs-5">
                     Here are your order details. We thank you for your purchase.
@@ -40,12 +81,12 @@ const Template3 = () => {
                 <div className="separator"></div>
                 <div className="d-flex flex-column flex-sm-row gap-7 gap-md-10 fw-bold">
                   <div className="flex-root d-flex flex-column">
-                    <span className="text-muted">Invoice Date</span>
-                    <span className="fs-5">14 July, 2022</span>
+                    <span className="text-muted">Date</span>
+                    <span className="fs-5">{templateData?.invoiceDate}</span>
                   </div>
                   <div className="flex-root d-flex flex-column">
                     <span className="text-muted">Invoice ID</span>
-                    <span className="fs-5">#INV-000414</span>
+                    <span className="fs-5">#{templateData?.billCount}</span>
                   </div>
                   {/* <div className="flex-root d-flex flex-column">
                     <span className="text-muted">Payment Method</span>
@@ -56,27 +97,21 @@ const Template3 = () => {
                   <div className="flex-root d-flex flex-column">
                     <span className="text-muted mb-3">Invoice To</span>
                     <div className="d-flex">
-                      <p className="text-gray-600 fw-semibold me-2">
-                        Name :
-                      </p>
-                      <p className="fs-6 text-gray-800 fw-semibold">
-                        Iris Watson.
+                      <p className="text-gray-600 fw-semibold me-2">Name :</p>
+                      <p className="fs-6 text-gray-800 fw-semibold text-capitalize">
+                        {templateData?.name}
                       </p>
                     </div>
                     <div className="d-flex">
-                      <p className="text-gray-600 fw-semibold me-2">
-                        Phone :
-                      </p>
+                      <p className="text-gray-600 fw-semibold me-2">Phone :</p>
                       <p className="fs-6 text-gray-800 fw-semibold">
-                        1234567890
+                        +91 {templateData?.phone}
                       </p>
                     </div>{" "}
                     <div className="d-flex mb-8">
-                      <p className="text-gray-600 fw-semibold me-2">
-                        Email :
-                      </p>
+                      <p className="text-gray-600 fw-semibold me-2">Email :</p>
                       <p className="fs-6 text-gray-800 fw-semibold">
-                        test@yopmail.com
+                        {templateData?.email}
                       </p>
                     </div>
                   </div>
@@ -93,61 +128,89 @@ const Template3 = () => {
                         </tr>
                       </thead>
                       <tbody className="fw-semibold text-gray-600">
-                        <tr>
-                          <td>
-                            <div className="d-flex align-items-center">
-                              <a
-                                href="../../demo1/dist/apps/ecommerce/catalog/edit-product.html"
-                                className="symbol symbol-50px"
-                              ></a>
-                              <div className="ms-5">
-                                <div className="fw-bold">Phone</div>
-                                <div className="fs-7 text-muted">
-                                  I Phone 15 Pro Max
-                                </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="text-end">2</td>
-                          <td className="text-end">₹1,50,000</td>
-                          <td className="text-end">₹240.00</td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex align-items-center">
-                              <a
-                                href="../../demo1/dist/apps/ecommerce/catalog/edit-product.html"
-                                className="symbol symbol-50px"
-                              ></a>
-                              <div className="ms-5">
-                                <div className="fw-bold">Keyboard</div>
-                                <div className="fs-7 text-muted">
-                                  Zebronics Gaming Keyboard
-                                </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="text-end">1</td>
-                          <td className="text-end">₹10,000</td>
-                          <td className="text-end">₹24.00</td>
-                        </tr>
+                        {templateData?.products?.map((product, index) => {
+                          return (
+                            <>
+                              <tr>
+                                <td>
+                                  <div className="d-flex align-items-center">
+                                    <a
+                                      href="../../demo1/dist/apps/ecommerce/catalog/edit-product.html"
+                                      className="symbol symbol-50px"
+                                    ></a>
+                                    <div className="ms-5">
+                                      <div className="fw-bold text-capitalize">
+                                        {product?.category?.label}
+                                      </div>
+                                      <div className="fs-7 text-muted">
+                                        {product?.product?.label?.replace(
+                                          /\b\w/g,
+                                          (char) => char.toUpperCase()
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="text-end">
+                                  {product?.quantity || 1}
+                                </td>
+                                <td className="text-end">
+                                  ₹{product?.price || "00.00"}
+                                </td>
+                                <td className="text-end">₹{product?.total}</td>
+                              </tr>
+                            </>
+                          );
+                        })}
+
                         <tr>
                           <td colspan="3" className="text-end">
                             Subtotal
                           </td>
-                          <td className="text-end">₹264.00</td>
+                          <td className="text-end">
+                            ₹{templateData?.subTotalCount}
+                          </td>
                         </tr>
                         <tr>
                           <td colspan="3" className="text-end">
-                            TAX (0%)
+                            <div className="d-flex align-items-start justify-content-end">
+                              <span className="me-3">TAX</span>{" "}
+                              <div>
+                                {templateData?.taxFields.map((el) => {
+                                  return (
+                                    <>
+                                      <div className="mb-2">
+                                        {"(" +
+                                          el?.name?.label +
+                                          " " +
+                                          el?.name?.tax +
+                                          "%)"}
+                                      </div>
+                                    </>
+                                  );
+                                })}
+                              </div>
+                            </div>
                           </td>
-                          <td className="text-end">₹0.00</td>
+                          <td className="text-end">
+                            {templateData?.taxFields.map((el) => {
+                              return (
+                                <>
+                                  <div className="mb-2">
+                                    ₹{el?.totalTaxCount}
+                                  </div>
+                                </>
+                              );
+                            })}
+                          </td>
                         </tr>
                         <tr>
                           <td colspan="3" className="text-end">
-                            Discount (0%)
+                            Discount ({templateData?.addDiscount}%)
                           </td>
-                          <td className="text-end">₹0.00</td>
+                          <td className="text-end">
+                            ₹{templateData?.discountCount}
+                          </td>
                         </tr>
                         <tr>
                           <td
@@ -157,7 +220,7 @@ const Template3 = () => {
                             Grand Total
                           </td>
                           <td className="text-dark fs-3 fw-bolder text-end">
-                            ₹269.00
+                            ₹{templateData?.total}
                           </td>
                         </tr>
                       </tbody>

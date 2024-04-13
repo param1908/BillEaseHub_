@@ -1,25 +1,64 @@
+import clsx from "clsx";
 import React from "react";
+import { useSelector } from "react-redux";
 
-const Template2 = () => {
+const Template2 = (props) => {
+  const templateData = props.templateData;
+  const { userDetails } = useSelector((state) => state.user);
+
   return (
     <>
       <div id="kt_app_content_container" className="container-xxl p-0">
         <div className="card-body p-0">
           <div className=" w-100">
-            <div className="d-flex justify-content-between flex-column flex-sm-row mb-19">
+            <div className="d-flex justify-content-between flex-column flex-sm-row mb-15">
               <h4 className="fw-bolder text-gray-800 fs-2qx pe-5 pb-7">
                 INVOICE
               </h4>
               <div className="text-sm-end">
-                <a href="#">
-                  <img
-                    alt="Logo"
-                    src="assets/media/svg/brand-logos/duolingo.svg"
-                  />
-                </a>
-                <div className="text-sm-end fw-semibold fs-4 text-muted mt-7">
-                  <div>Cecilia Chapman, 711-2880 Nulla St, Mankato</div>
-                  <div>Mississippi 96522</div>
+                {userDetails?.user?.merchantData?.logo ? (
+                  <div className="d-flex justify-content-end align-items-center">
+                    <img
+                      alt="Logo"
+                      src={
+                        userDetails?.user?.imageUrl +
+                        userDetails?.user?.merchantData?.logo
+                      }
+                    />
+                  </div>
+                ) : (
+                  <div className="d-flex justify-content-end align-items-center">
+                    <div
+                      className="text-uppercase d-flex justify-content-center align-items-center fw-bold"
+                      style={{
+                        width: "35px",
+                        height: "35px",
+                        borderRadius: "8px",
+                        backgroundColor: "#868fa7 ",
+                        color: "#f9f9f9",
+                        fontSize: "19px",
+                      }}
+                    >
+                      {userDetails?.user?.fullName[0]}
+                    </div>
+                  </div>
+                )}
+                <div className="text-sm-end fw-semibold fs-4 text-muted mt-3">
+                  <div className="text-capitalize fw-bold">
+                    {userDetails?.user?.fullName}
+                  </div>
+                  <div className="text-capitalize">
+                    Address: {userDetails?.user?.merchantData?.location}
+                  </div>
+                  {userDetails?.user?.email && (
+                    <div>Email: {userDetails?.user?.email}</div>
+                  )}
+                  {userDetails?.user?.phoneNumber && (
+                    <div>Phone No: +91 {userDetails?.user?.phoneNumber}</div>
+                  )}
+                  {userDetails?.user?.merchantData?.GSTIN && (
+                    <div>GSTIN: {userDetails?.user?.merchantData?.GSTIN}</div>
+                  )}
                 </div>
               </div>
             </div>
@@ -33,41 +72,45 @@ const Template2 = () => {
                     <p className="text-gray-600 fs-6 fw-semibold me-2">
                       Name :
                     </p>
-                    <p className="fs-6 text-gray-800 fw-semibold">
-                      Iris Watson.
+                    <p className="fs-6 text-gray-800 fw-semibold text-capitalize">
+                      {templateData?.name}
                     </p>
                   </div>
                   <div className="d-flex">
                     <p className="text-gray-600 fs-6 fw-semibold me-2">
                       Phone :
                     </p>
-                    <p className="fs-6 text-gray-800 fw-semibold">1234567890</p>
-                  </div>{" "}
-                  <div className="d-flex mb-8">
-                    <p className="text-gray-600 fs-6 fw-semibold me-2">
-                      Email :
-                    </p>
                     <p className="fs-6 text-gray-800 fw-semibold">
-                      test@yopmail.com
+                      +91 {templateData?.phone}
                     </p>
-                  </div>
+                  </div>{" "}
+                  {templateData?.email && (
+                    <div className="d-flex mb-8">
+                      <p className="text-gray-600 fs-6 fw-semibold me-2">
+                        Email :
+                      </p>
+                      <p className="fs-6 text-gray-800 fw-semibold">
+                        {templateData?.email}
+                      </p>
+                    </div>
+                  )}
                   <div className="text-gray-600 fs-6 fw-semibold mb-3">
                     INVOICE NO.
                   </div>
                   <div className="fs-6 text-gray-800 fw-semibold mb-8">
-                    56758
+                    {templateData?.billCount}
                   </div>
                   <div className="text-gray-600 fs-6 fw-semibold mb-3">
-                    INVOICE DATE
+                    DATE
                   </div>
                   <div className="fs-6 text-gray-800 fw-semibold">
-                    12 May, 2020
+                    {templateData?.invoiceDate}
                   </div>
                 </div>
               </div>
               <div className="d-flex justify-content-between flex-column flex-md-row">
-                <div className="flex-grow-1 pt-8 mb-13">
-                  <div className="table-responsive border-bottom mb-14">
+                <div className="flex-grow-1 pt-8 mb-19">
+                  <div className="table-responsive border-bottom mb-10">
                     <table className="table">
                       <thead>
                         <tr className="border-bottom fs-6 fw-bold text-muted text-uppercase">
@@ -80,47 +123,107 @@ const Template2 = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        <tr className="fw-bold text-gray-700 fs-5 text-end">
-                          <td className="d-flex align-items-center pt-11">
-                            <i className="fa fa-genderless text-danger fs-1 me-2"></i>
-                            Phone - Vivo
-                          </td>
-                          <td className="pt-11">80</td>
-                          <td className="pt-11">₹40.00</td>
-                          <td className="pt-11 fs-5 pe-lg-6 text-dark fw-bolder">
-                            ₹3200.00
-                          </td>
-                        </tr>
-                        <tr className="fw-bold text-gray-700 fs-5 text-end">
-                          <td className="d-flex align-items-center">
-                            <i className="fa fa-genderless text-success fs-1 me-2"></i>
-                            Keyboard - Gaming
-                          </td>
-                          <td>120</td>
-                          <td>₹40.00</td>
-                          <td className="fs-5 text-dark fw-bolder pe-lg-6">
-                            ₹4800.00
-                          </td>
-                        </tr>
-                        <tr className="fw-bold text-gray-700 fs-5 text-end">
-                          <td className="d-flex align-items-center pb-10">
-                            <i className="fa fa-genderless text-primary fs-1 me-2"></i>
-                            Phone - I Phone 15 Pro Max
-                          </td>
-                          <td>210</td>
-                          <td>₹60.00</td>
-                          <td className="fs-5 text-dark fw-bolder pe-lg-6">
-                            ₹12600.00
-                          </td>
-                        </tr>
+                        {templateData?.products?.map((product, index) => {
+                          let className = "";
+                          if (index % 3 === 0) {
+                            className = "text-warning";
+                          } else if (index % 3 === 1) {
+                            className = "text-success";
+                          } else if (index % 3 === 2) {
+                            className = "text-info";
+                          } else {
+                            className = "text-yellow";
+                          }
+
+                          return (
+                            <>
+                              <tr className="fw-bold text-gray-700 fs-5 text-end">
+                                <td className="d-flex align-items-center pt-11">
+                                  <i
+                                    className={clsx(
+                                      "fa fa-genderless fs-2 me-2",
+                                      className
+                                    )}
+                                  ></i>
+                                  <span className="text-capitalize pe-1">
+                                    {product?.category?.label}
+                                    {" - "}
+                                  </span>
+
+                                  {product?.product?.label?.replace(
+                                    /\b\w/g,
+                                    (char) => char.toUpperCase()
+                                  )}
+                                </td>
+                                <td className="pt-11">
+                                  {product?.quantity || 1}
+                                </td>
+                                <td className="pt-11">
+                                  ₹{product?.price || "00.00"}
+                                </td>
+                                <td className="pt-11 fs-5 pe-lg-6 text-dark fw-bolder">
+                                  ₹{product?.total}
+                                </td>
+                              </tr>
+                            </>
+                          );
+                        })}
                       </tbody>
                     </table>
+                  </div>
+                  <div className="d-flex justify-content-end mb-7">
+                    <div className="mw-300px">
+                      <div className="d-flex flex-stack mb-3">
+                        <div className="fw-semibold pe-10 text-gray-600 fs-7">
+                          Subtotal:
+                        </div>
+                        <div className="text-end fw-bold fs-6 text-gray-800">
+                          ₹ {templateData?.subTotalCount}
+                        </div>
+                      </div>
+                      <div className="d-flex flex-stack mb-3 align-items-start">
+                        <div
+                          className="fw-semibold text-gray-600 fs-7"
+                          style={{ paddingTop: "2px" }}
+                        >
+                          TAX
+                        </div>
+                        <div className="ps-2">
+                          {templateData?.taxFields.map((el) => {
+                            return (
+                              <div className="d-flex flex-stack mb-1">
+                                <div className="fw-semibold pe-17 text-gray-600 fs-7">
+                                  {"(" +
+                                    el?.name?.label +
+                                    " " +
+                                    el?.name?.tax +
+                                    "%)"}
+                                </div>
+                                <div className="text-end fw-bold fs-6 text-gray-800">
+                                  ₹ {el?.totalTaxCount}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                      <div className="d-flex flex-stack mb-3">
+                        <div className="fw-semibold pe-10 text-gray-600 fs-7">
+                          Discount ({templateData?.addDiscount}%)
+                        </div>
+                        <div className="text-end fw-bold fs-6 text-gray-800">
+                          ₹ {templateData?.discountCount}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                   <div className="text-end">
                     <div className="fs-3 fw-bold text-muted mb-3">
                       TOTAL AMOUNT
                     </div>
-                    <div className="fs-xl-2x fs-2 fw-bolder">₹20,600.00</div>
+                    <div className="fs-xl-2x fs-2 fw-bolder">
+                      ₹{templateData?.total}
+                    </div>
                     <div className="text-muted fw-semibold">Taxes included</div>
                     <div className="border-bottom w-100 my-7 my-lg-16"></div>
                   </div>

@@ -2,19 +2,28 @@ import React, { useState } from "react";
 import Template1 from "./Template1";
 import Template2 from "./Template2";
 import Template3 from "./Template3";
+import { useLocation } from "react-router-dom";
 
 const BillTemplates = () => {
+  const location = useLocation();
+  const data = location.state;
   const [selectedTemplate, setSelectedTemplate] = useState("Template1");
 
   return (
     <>
-      <div className="row w-100">
+      <div className="row">
         <div className="col-12 col-lg-9 h-auto mb-5">
           <div className="card">
             <div className="car-body p-12">
-              {selectedTemplate === "Template1" && <Template1 />}
-              {selectedTemplate === "Template2" && <Template2 />}
-              {selectedTemplate === "Template3" && <Template3 />}
+              {selectedTemplate === "Template1" && (
+                <Template1 templateData={data} />
+              )}
+              {selectedTemplate === "Template2" && (
+                <Template2 templateData={data} />
+              )}
+              {selectedTemplate === "Template3" && (
+                <Template3 templateData={data} />
+              )}
             </div>
           </div>
         </div>

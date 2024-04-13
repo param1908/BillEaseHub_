@@ -37,3 +37,7 @@
   right: 51px;
   z-index: 1;
 }
+
+.tax-field:not(:last-child) {
+  margin-bottom: 4px;
+}
