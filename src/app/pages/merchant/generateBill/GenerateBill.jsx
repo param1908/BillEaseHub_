@@ -64,8 +64,12 @@ const GenerateBill = () => {
   useEffect(() => {
     // Initialize Flatpickr
     const invoiceDatePicker = flatpickr(invoiceDateRef.current, {
-      dateFormat: "Y-m-d", // You can customize the date format
-      // Add any other options you need
+      dateFormat: "d/m/Y",
+      defaultDate: "today",
+      onChange: function (selectedDates, dateStr, instance) {
+        const date = moment(selectedDates[0]).format("DD/MM/YYYY");
+        setBillDetails({ ...billDetails, invoiceDate: date });
+      },
     });
 
     // Cleanup function
@@ -74,7 +78,7 @@ const GenerateBill = () => {
     return () => {
       invoiceDatePicker.destroy();
     };
-  }, []);
+  }, [invoiceDateRef]);
 
   const handleBillInput = (e) => {
     console.log("billdetails", billDetails);
@@ -156,11 +160,7 @@ const GenerateBill = () => {
 
   const getCategoryData = async () => {
     try {
-      const payload = {
-        page: 1,
-        limit: 500000,
-      };
-      const categoryData = await getAllCategoriesApi(payload);
+      const categoryData = await getAllCategoriesApi({});
       let catData = categoryData?.data?.categoryDetails.map((el) => {
         return { value: el._id, label: el.name };
       });
@@ -205,8 +205,6 @@ const GenerateBill = () => {
 
         const payload = {
           categoryId: option?.value,
-          page: 1,
-          limit: 500000,
         };
         const response = await getAllProductsApi(payload);
         let produstDetail = response?.data?.productDetails.map((el) => {
@@ -327,11 +325,6 @@ const GenerateBill = () => {
     }
 
     setProduct(prodData);
-  };
-
-  const handleInvoiceDate = (e) => {
-    console.log(e, "e");
-    // invoiceDateRef.current.value = formatDate(dateStr);
   };
 
   const handleRemoveItem = (index) => {
@@ -596,11 +589,6 @@ const GenerateBill = () => {
                       placeholder="Select date"
                       name="invoice_due_date"
                       type="text"
-                      readOnly // Use readOnly instead of readonly
-                      value={formatDate(new Date())}
-                      onChangeCapture={(e) => {
-                        handleInvoiceDate(e);
-                      }}
                     />
                     <span className="svg-icon svg-icon-2 position-absolute end-0 ms-4">
                       <svg

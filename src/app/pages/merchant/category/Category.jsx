@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
-import { Button, Modal } from "react-bootstrap";
+import { Button, Modal, OverlayTrigger, Tooltip } from "react-bootstrap";
 import * as Yup from "yup";
 import Select from "react-select";
 import { toast } from "react-toastify";
@@ -256,26 +256,35 @@ const Category = () => {
                           </div>
                         </div>
 
-                        <div
-                          class="text-center mt-5 mb-md-0 mb-lg-5 mb-md-0 mb-lg-5 mb-lg-0 mb-5 d-flex flex-column cursor-pointer"
-                          onClick={() =>
-                            navigate(
-                              `/merchant/product?category=${el?._id}&name=${el?.name}`
-                            )
+                        <OverlayTrigger
+                          placement="bottom"
+                          overlay={
+                            <Tooltip id="tooltip">
+                              <strong> {el?.description}</strong>
+                            </Tooltip>
                           }
                         >
-                          <a
-                            href="#"
-                            class="font-size-h5 font-weight-bolder text-dark-75 text-hover-primary mb-1"
+                          <div
+                            class="text-center mt-5 mb-md-0 mb-lg-5 mb-md-0 mb-lg-5 mb-lg-0 mb-5 d-flex flex-column cursor-pointer"
+                            onClick={() =>
+                              navigate(
+                                `/merchant/product?category=${el?._id}&name=${el?.name}`
+                              )
+                            }
                           >
-                            {el?.name}
-                          </a>
-                          <span class="font-size-lg">
-                            {el.description?.length > 70
-                              ? el.description?.slice(0, 70) + "...."
-                              : el.description}
-                          </span>
-                        </div>
+                            <a
+                              href="#"
+                              class="font-size-h5 font-weight-bolder text-dark-75 text-hover-primary mb-1"
+                            >
+                              {el?.name}
+                            </a>
+                            <span class="font-size-lg">
+                              {el?.description?.length > 70
+                                ? el?.description?.slice(0, 70) + "...."
+                                : el?.description}
+                            </span>
+                          </div>
+                        </OverlayTrigger>
                       </div>
                     </div>
                   </div>

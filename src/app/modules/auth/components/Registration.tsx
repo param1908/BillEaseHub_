@@ -219,7 +219,13 @@ export function Registration() {
                     <div className="text-danger mt-2">
                       <ErrorMessage name="accountType" />
                     </div>
-                    <div className="w-100 d-flex">
+                    <div className="w-100 d-flex justify-content-between align-items-center">
+                      <div className="text-gray-500 text-center fw-semibold fs-6">
+                        Already have an account?{" "}
+                        <Link to="/auth/login" className="link-primary">
+                          Login
+                        </Link>
+                      </div>
                       <button
                         type="submit"
                         className="btn btn-lg btn-primary mx-auto mx-md-0 ms-md-auto"
