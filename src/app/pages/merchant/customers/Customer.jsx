@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Modal } from "react-bootstrap";
-import { KTIcon } from "../../../../_metronic/helpers";
+import { useNavigate } from "react-router-dom";
+
 
 const Customer = () => {
+  const navigate = useNavigate();
   return (
     <>
       <div
@@ -95,7 +96,8 @@ const Customer = () => {
                       </div>
                     </td>
                     <td role="cell" className="text-end min-w-100px">
-                      <a className="btn btn-sm btn-light-primary py-3 cursor-pointer">
+                      <a className="btn btn-sm btn-light-primary py-3 cursor-pointer"
+                      onClick={() => {navigate('/merchant/customers-details')}}>
                         View
                       </a>
                     </td>
