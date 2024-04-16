@@ -233,8 +233,8 @@ const Product = () => {
         style={{ minHeight: "calc(100vh - 130px)" }}
       >
         <div className="card-header">
-          <div class="card-title m-0 d-flex justify-content-between w-100">
-            <h3 class="fw-bolder m-0 d-flex align-items-center">
+          <div className="card-title m-0 d-flex justify-content-between w-100">
+            <h3 className="fw-bolder m-0 d-flex align-items-center">
               <p className="mb-0">
                 {catId ? catName + "'s" : "ALL"} Products [ {total} ]
               </p>
@@ -252,7 +252,7 @@ const Product = () => {
                       setPaginate({ ...paginate, page: 1 });
                       navigate("/merchant/product");
                     }}
-                    class="btn btn-sm btn-light-primary py-2 cursor-pointer"
+                    className="btn btn-sm btn-light-primary py-2 cursor-pointer"
                   >
                     All Products
                   </a>
@@ -260,15 +260,15 @@ const Product = () => {
               )}
             </h3>
             <div className="d-flex">
-              <div class="d-flex align-items-center position-relative my-1 me-md-2">
-                <i class="ki-duotone ki-magnifier fs-1 position-absolute ms-6">
-                  <span class="path1"></span>
-                  <span class="path2"></span>
+              <div className="d-flex align-items-center position-relative my-1 me-md-2">
+                <i className="ki-duotone ki-magnifier fs-1 position-absolute ms-6">
+                  <span className="path1"></span>
+                  <span className="path2"></span>
                 </i>
                 <input
                   type="text"
                   data-kt-user-table-filter="search"
-                  class="form-control form-control-solid w-250px ps-14"
+                  className="form-control form-control-solid w-250px ps-14"
                   placeholder="Search Product"
                   onKeyUp={(e) => {
                     setPaginate({ ...paginate, page: 1 });
@@ -287,60 +287,60 @@ const Product = () => {
                   setIsEdit(false);
                 }}
               >
-                <a class="btn btn-sm btn-light-primary py-4 cursor-pointer">
-                  <i class="ki-duotone ki-plus fs-3"></i>Add Product
+                <a className="btn btn-sm btn-light-primary py-4 cursor-pointer">
+                  <i className="ki-duotone ki-plus fs-3"></i>Add Product
                 </a>
               </div>
             </div>
           </div>
         </div>
         <div className="card-body h-auto">
-          <div class="card-body py-4">
-            <div class="table-responsive">
+          <div className="card-body py-4">
+            <div className="table-responsive">
               <table
                 id="kt_table_users"
-                class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer"
+                className="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer"
                 role="table"
               >
                 <thead>
-                  <tr class="text-start text-muted fw-bolder fs-7 text-uppercase gs-0">
-                    <th colspan="1" role="columnheader" class="min-w-125px">
+                  <tr className="text-start text-muted fw-bolder fs-7 text-uppercase gs-0">
+                    <th colspan="1" role="columnheader" className="min-w-125px">
                       Product
                     </th>
-                    <th colspan="1" role="columnheader" class="min-w-125px">
+                    <th colspan="1" role="columnheader" className="min-w-125px">
                       DESCRIPTION
                     </th>
-                    <th colspan="1" role="columnheader" class="min-w-125px">
+                    <th colspan="1" role="columnheader" className="min-w-125px">
                       Price
                     </th>
-                    <th colspan="1" role="columnheader" class="min-w-125px">
+                    <th colspan="1" role="columnheader" className="min-w-125px">
                       Category
                     </th>
-                    <th colspan="1" role="columnheader" class="min-w-125px">
+                    <th colspan="1" role="columnheader" className="min-w-125px">
                       CREATED DATE
                     </th>
-                    <th colspan="1" role="columnheader" class="min-w-125px">
+                    <th colspan="1" role="columnheader" className="min-w-125px">
                       Status
                     </th>
                     <th
                       colspan="1"
                       role="columnheader"
-                      class="text-center min-w-100px"
+                      className="text-center min-w-100px"
                     >
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody class="text-gray-600 fw-bold" role="rowgroup">
+                <tbody className="text-gray-600 fw-bold" role="rowgroup">
                   {products.length &&
                     products.map((el, index) => {
                       return (
                         <tr role="row" key={index}>
-                          <td role="cell" class="">
-                            <div class="d-flex align-items-center">
-                              <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
+                          <td role="cell" className="">
+                            <div className="d-flex align-items-center">
+                              <div className="symbol symbol-circle symbol-50px overflow-hidden me-3">
                                 <a>
-                                  <div class="symbol-label fs-3 bg-light-danger text-danger cursor-pointer">
+                                  <div className="symbol-label fs-3 bg-light-danger text-danger cursor-pointer">
                                     <img
                                       src={el?.productImageUrl + el?.image}
                                       alt="logo"
@@ -349,66 +349,66 @@ const Product = () => {
                                   </div>
                                 </a>
                               </div>
-                              <div class="d-flex flex-column">
-                                <a class="text-gray-800 text-hover-primary mb-1 text-capitalize cursor-pointer">
+                              <div className="d-flex flex-column">
+                                <a className="text-gray-800 text-hover-primary mb-1 text-capitalize cursor-pointer">
                                   {el?.name}
                                 </a>
                               </div>
                             </div>
                           </td>
-                          <td role="cell" class="">
+                          <td role="cell" className="">
                             {el.description?.length > 70
                               ? el.description?.slice(0, 70) + "...."
                               : el.description}
                           </td>
-                          <td role="cell" class="text-capitalize">
+                          <td role="cell" className="text-capitalize">
                             {el?.price}
                           </td>
-                          <td role="cell" class="text-capitalize">
+                          <td role="cell" className="text-capitalize">
                             {el?.categoryData?.name}
                           </td>
-                          <td role="cell" class="">
-                            <div class="badge badge-light fw-bolder">
+                          <td role="cell" className="">
+                            <div className="badge badge-light fw-bolder">
                               {moment(el?.createdAt).format("DD-MM-YYYY")}
                             </div>
                           </td>
-                          <td role="cell" class="">
+                          <td role="cell" className="">
                             {" "}
                             {el?.status == "Active" ? (
-                              <div class="badge badge-light-success fw-bolder">
+                              <div className="badge badge-light-success fw-bolder">
                                 In Stock
                               </div>
                             ) : (
-                              <div class="badge badge-light-danger fw-bolder">
+                              <div className="badge badge-light-danger fw-bolder">
                                 Out Of Stock
                               </div>
                             )}
                           </td>
 
-                          <td role="cell" class="text-end min-w-100px">
+                          <td role="cell" className="text-end min-w-100px">
                             <a
-                              class="btn btn-light btn-active-light-primary btn-sm d-flex align-items-center cursor-pointer"
+                              className="btn btn-light btn-active-light-primary btn-sm d-flex align-items-center cursor-pointer"
                               data-kt-menu-trigger="click"
                               data-kt-menu-placement="bottom-end"
                             >
                               Actions
-                              <i class="ki-duotone ki-down fs-5 m-0 ms-2"></i>
+                              <i className="ki-duotone ki-down fs-5 m-0 ms-2"></i>
                             </a>
                             <div
-                              class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4"
+                              className="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4"
                               data-kt-menu="true"
                             >
-                              <div class="menu-item px-3">
+                              <div className="menu-item px-3">
                                 <a
-                                  class="menu-link px-3"
+                                  className="menu-link px-3"
                                   onClick={() => handleEdit(el)}
                                 >
                                   Edit
                                 </a>
                               </div>
-                              <div class="menu-item px-3">
+                              <div className="menu-item px-3">
                                 <a
-                                  class="menu-link px-3"
+                                  className="menu-link px-3"
                                   data-kt-users-table-filter="delete_row"
                                   onClick={() => {
                                     setShowAlert(true);
@@ -469,16 +469,16 @@ const Product = () => {
           <div className="modal-body py-lg-10 px-lg-10">
             <div className="row">
               <div className="col-12 col-sm-4">
-                <div class="card card-flush py-4 h-100">
-                  <div class="card-header">
-                    <div class="card-title">
+                <div className="card card-flush py-4 h-100">
+                  <div className="card-header">
+                    <div className="card-title">
                       <h2>Thumbnail</h2>
                     </div>
                   </div>
 
-                  <div class="card-body text-center pt-0">
+                  <div className="card-body text-center pt-0">
                     <div
-                      class="image-input image-input-empty image-input-outline image-input-placeholder mb-3"
+                      className="image-input image-input-empty image-input-outline image-input-placeholder mb-3"
                       data-kt-image-input="true"
                       style={{
                         backgroundImage: `url(${
@@ -486,19 +486,19 @@ const Product = () => {
                         })`,
                       }}
                     >
-                      <div class="image-input-wrapper w-150px h-150px"></div>
+                      <div className="image-input-wrapper w-150px h-150px"></div>
 
                       <label
-                        class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
+                        className="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
                         data-kt-image-input-action="change"
                         data-bs-toggle="tooltip"
                         aria-label="Change avatar"
                         data-bs-original-title="Change avatar"
                         data-kt-initialized="1"
                       >
-                        <i class="ki-duotone ki-pencil fs-7">
-                          <span class="path1"></span>
-                          <span class="path2"></span>
+                        <i className="ki-duotone ki-pencil fs-7">
+                          <span className="path1"></span>
+                          <span className="path2"></span>
                         </i>
 
                         <input
@@ -515,35 +515,35 @@ const Product = () => {
                       </label>
 
                       <span
-                        class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
+                        className="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
                         data-kt-image-input-action="cancel"
                         data-bs-toggle="tooltip"
                         aria-label="Cancel avatar"
                         data-bs-original-title="Cancel avatar"
                         data-kt-initialized="1"
                       >
-                        <i class="ki-duotone ki-cross fs-2">
-                          <span class="path1"></span>
-                          <span class="path2"></span>
+                        <i className="ki-duotone ki-cross fs-2">
+                          <span className="path1"></span>
+                          <span className="path2"></span>
                         </i>{" "}
                       </span>
 
                       <span
-                        class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
+                        className="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
                         data-kt-image-input-action="remove"
                         data-bs-toggle="tooltip"
                         aria-label="Remove avatar"
                         data-bs-original-title="Remove avatar"
                         data-kt-initialized="1"
                       >
-                        <i class="ki-duotone ki-cross fs-2">
-                          <span class="path1"></span>
-                          <span class="path2"></span>
+                        <i className="ki-duotone ki-cross fs-2">
+                          <span className="path1"></span>
+                          <span className="path2"></span>
                         </i>{" "}
                       </span>
                     </div>
 
-                    <div class="text-muted fs-7">
+                    <div className="text-muted fs-7">
                       Set the product thumbnail image. Only *.png, *.jpg and
                       *.jpeg image files are accepted
                     </div>
@@ -558,7 +558,7 @@ const Product = () => {
                 </div>
               </div>
               <div className="col-8">
-                <div class="card card-flush py-4 px-4 h-100 justify-content-between">
+                <div className="card card-flush py-4 px-4 h-100 justify-content-between">
                   <div>
                     <div className="fv-row mb-8">
                       <input

@@ -9,6 +9,7 @@ import Tax from "../pages/merchant/tax/Tax";
 import GenerateBill from "../pages/merchant/generateBill/GenerateBill";
 import BillTemplates from "../pages/merchant/previewBills/BillTemplates";
 import Customer from "../pages/merchant/customers/Customer";
+import CustomerDetails from "../pages/merchant/customers/CustomerDetails";
 const { customer, merchant, admin } = UserRoles;
 const { BEFORE_AUTH, AFTER_AUTH, DEFAULT } = LayoutTypes;
 
@@ -160,6 +161,16 @@ export const routeList = [
     path: "/merchant/customers",
     name: "Customers",
     element: <Customer />,
+    layoutType: AFTER_AUTH,
+    isAuthRequired: true,
+    accessRoles: [merchant],
+  },
+  {
+    id: "CUST_14",
+    icon: "",
+    path: "/merchant/customers-details",
+    name: "Customer Details",
+    element: <CustomerDetails />,
     layoutType: AFTER_AUTH,
     isAuthRequired: true,
     accessRoles: [merchant],

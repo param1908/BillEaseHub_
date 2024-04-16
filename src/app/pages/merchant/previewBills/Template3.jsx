@@ -108,12 +108,16 @@ const Template3 = (props) => {
                         +91 {templateData?.phone}
                       </p>
                     </div>{" "}
-                    <div className="d-flex mb-8">
-                      <p className="text-gray-600 fw-semibold me-2">Email :</p>
-                      <p className="fs-6 text-gray-800 fw-semibold">
-                        {templateData?.email}
-                      </p>
-                    </div>
+                    {templateData?.email && (
+                      <div className="d-flex mb-8">
+                        <p className="text-gray-600 fw-semibold me-2">
+                          Email :
+                        </p>
+                        <p className="fs-6 text-gray-800 fw-semibold">
+                          {templateData?.email}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="d-flex justify-content-between flex-column">

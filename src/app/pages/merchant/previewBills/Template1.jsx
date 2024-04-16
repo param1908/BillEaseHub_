@@ -8,9 +8,9 @@ const Template1 = (props) => {
   console.log("templateData1", templateData);
   return (
     <>
-      <div id="kt_app_content" className="app-content flex-column-fluid">
+      <div id="kt_app_content" className="app-content flex-column-fluid p-0">
         <div id="kt_app_content_container" className="container-xxl p-0">
-          <div className="card-body">
+          <div className="card-body p-0">
             <div className="d-flex flex-column flex-xl-row">
               <div className="flex-lg-row-fluid mb-10 mb-xl-0">
                 <div className="mt-n1">
