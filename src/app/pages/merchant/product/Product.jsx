@@ -20,6 +20,7 @@ import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import Pagination from "react-js-pagination";
 import MainLoader from "../../../loaders/MainLoader";
+import NotFoundLogo from "../../../beh_images/not-found.png";
 
 const Product = () => {
   const navigate = useNavigate();
@@ -295,138 +296,179 @@ const Product = () => {
           </div>
         </div>
         <div className="card-body h-auto">
-          <div className="card-body py-4">
-            <div className="table-responsive">
-              <table
-                id="kt_table_users"
-                className="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer"
-                role="table"
-              >
-                <thead>
-                  <tr className="text-start text-muted fw-bolder fs-7 text-uppercase gs-0">
-                    <th colspan="1" role="columnheader" className="min-w-125px">
-                      Product
-                    </th>
-                    <th colspan="1" role="columnheader" className="min-w-125px">
-                      DESCRIPTION
-                    </th>
-                    <th colspan="1" role="columnheader" className="min-w-125px">
-                      Price
-                    </th>
-                    <th colspan="1" role="columnheader" className="min-w-125px">
-                      Category
-                    </th>
-                    <th colspan="1" role="columnheader" className="min-w-125px">
-                      CREATED DATE
-                    </th>
-                    <th colspan="1" role="columnheader" className="min-w-125px">
-                      Status
-                    </th>
-                    <th
-                      colspan="1"
-                      role="columnheader"
-                      className="text-center min-w-100px"
-                    >
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="text-gray-600 fw-bold" role="rowgroup">
-                  {products.length &&
-                    products.map((el, index) => {
-                      return (
-                        <tr role="row" key={index}>
-                          <td role="cell" className="">
-                            <div className="d-flex align-items-center">
-                              <div className="symbol symbol-circle symbol-50px overflow-hidden me-3">
-                                <a>
-                                  <div className="symbol-label fs-3 bg-light-danger text-danger cursor-pointer">
-                                    <img
-                                      src={el?.productImageUrl + el?.image}
-                                      alt="logo"
-                                      style={{ width: "100%" }}
-                                    />
-                                  </div>
-                                </a>
+          {products.length > 0 && (
+            <div className="card-body py-4">
+              <div className="table-responsive">
+                <table
+                  id="kt_table_users"
+                  className="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer"
+                  role="table"
+                >
+                  <thead>
+                    <tr className="text-start text-muted fw-bolder fs-7 text-uppercase gs-0">
+                      <th
+                        colspan="1"
+                        role="columnheader"
+                        className="min-w-125px"
+                      >
+                        Product
+                      </th>
+                      <th
+                        colspan="1"
+                        role="columnheader"
+                        className="min-w-125px"
+                      >
+                        DESCRIPTION
+                      </th>
+                      <th
+                        colspan="1"
+                        role="columnheader"
+                        className="min-w-125px"
+                      >
+                        Price
+                      </th>
+                      <th
+                        colspan="1"
+                        role="columnheader"
+                        className="min-w-125px"
+                      >
+                        Category
+                      </th>
+                      <th
+                        colspan="1"
+                        role="columnheader"
+                        className="min-w-125px"
+                      >
+                        CREATED DATE
+                      </th>
+                      <th
+                        colspan="1"
+                        role="columnheader"
+                        className="min-w-125px"
+                      >
+                        Status
+                      </th>
+                      <th
+                        colspan="1"
+                        role="columnheader"
+                        className="text-center min-w-100px"
+                      >
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-gray-600 fw-bold" role="rowgroup">
+                    {products.length &&
+                      products.map((el, index) => {
+                        return (
+                          <tr role="row" key={index}>
+                            <td role="cell" className="">
+                              <div className="d-flex align-items-center">
+                                <div className="symbol symbol-circle symbol-50px overflow-hidden me-3">
+                                  <a>
+                                    <div className="symbol-label fs-3 bg-light-danger text-danger cursor-pointer">
+                                      <img
+                                        src={el?.productImageUrl + el?.image}
+                                        alt="logo"
+                                        style={{ width: "100%" }}
+                                      />
+                                    </div>
+                                  </a>
+                                </div>
+                                <div className="d-flex flex-column">
+                                  <a className="text-gray-800 text-hover-primary mb-1 text-capitalize cursor-pointer">
+                                    {el?.name}
+                                  </a>
+                                </div>
                               </div>
-                              <div className="d-flex flex-column">
-                                <a className="text-gray-800 text-hover-primary mb-1 text-capitalize cursor-pointer">
-                                  {el?.name}
-                                </a>
+                            </td>
+                            <td role="cell" className="">
+                              {el.description?.length > 70
+                                ? el.description?.slice(0, 70) + "...."
+                                : el.description}
+                            </td>
+                            <td role="cell" className="text-capitalize">
+                              {el?.price}
+                            </td>
+                            <td role="cell" className="text-capitalize">
+                              {el?.categoryData?.name}
+                            </td>
+                            <td role="cell" className="">
+                              <div className="badge badge-light fw-bolder">
+                                {moment(el?.createdAt).format("DD-MM-YYYY")}
                               </div>
-                            </div>
-                          </td>
-                          <td role="cell" className="">
-                            {el.description?.length > 70
-                              ? el.description?.slice(0, 70) + "...."
-                              : el.description}
-                          </td>
-                          <td role="cell" className="text-capitalize">
-                            {el?.price}
-                          </td>
-                          <td role="cell" className="text-capitalize">
-                            {el?.categoryData?.name}
-                          </td>
-                          <td role="cell" className="">
-                            <div className="badge badge-light fw-bolder">
-                              {moment(el?.createdAt).format("DD-MM-YYYY")}
-                            </div>
-                          </td>
-                          <td role="cell" className="">
-                            {" "}
-                            {el?.status == "Active" ? (
-                              <div className="badge badge-light-success fw-bolder">
-                                In Stock
-                              </div>
-                            ) : (
-                              <div className="badge badge-light-danger fw-bolder">
-                                Out Of Stock
-                              </div>
-                            )}
-                          </td>
+                            </td>
+                            <td role="cell" className="">
+                              {" "}
+                              {el?.status == "Active" ? (
+                                <div className="badge badge-light-success fw-bolder">
+                                  In Stock
+                                </div>
+                              ) : (
+                                <div className="badge badge-light-danger fw-bolder">
+                                  Out Of Stock
+                                </div>
+                              )}
+                            </td>
 
-                          <td role="cell" className="text-end min-w-100px">
-                            <a
-                              className="btn btn-light btn-active-light-primary btn-sm d-flex align-items-center cursor-pointer"
-                              data-kt-menu-trigger="click"
-                              data-kt-menu-placement="bottom-end"
+                            <td
+                              role="cell"
+                              className="text-end min-w-100px d-flex justify-content-center"
                             >
-                              Actions
-                              <i className="ki-duotone ki-down fs-5 m-0 ms-2"></i>
-                            </a>
-                            <div
-                              className="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4"
-                              data-kt-menu="true"
-                            >
-                              <div className="menu-item px-3">
-                                <a
-                                  className="menu-link px-3"
-                                  onClick={() => handleEdit(el)}
-                                >
-                                  Edit
-                                </a>
+                              <a
+                                className="btn btn-light btn-active-light-primary btn-sm d-flex align-items-center cursor-pointer"
+                                data-kt-menu-trigger="click"
+                                data-kt-menu-placement="bottom-end"
+                                style={{ maxWidth: "100px" }}
+                              >
+                                Actions
+                                <i className="ki-duotone ki-down fs-5 m-0 ms-2"></i>
+                              </a>
+                              <div
+                                className="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4"
+                                data-kt-menu="true"
+                              >
+                                <div className="menu-item px-3">
+                                  <a
+                                    className="menu-link px-3"
+                                    onClick={() => handleEdit(el)}
+                                  >
+                                    Edit
+                                  </a>
+                                </div>
+                                <div className="menu-item px-3">
+                                  <a
+                                    className="menu-link px-3"
+                                    data-kt-users-table-filter="delete_row"
+                                    onClick={() => {
+                                      setShowAlert(true);
+                                      setTempId(el?._id);
+                                    }}
+                                  >
+                                    Delete
+                                  </a>
+                                </div>
                               </div>
-                              <div className="menu-item px-3">
-                                <a
-                                  className="menu-link px-3"
-                                  data-kt-users-table-filter="delete_row"
-                                  onClick={() => {
-                                    setShowAlert(true);
-                                    setTempId(el?._id);
-                                  }}
-                                >
-                                  Delete
-                                </a>
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
-              </table>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          )}
+          {products.length === 0 && (
+            <div
+              className="d-flex justify-content-center align-items-center"
+              style={{ minHeight: "calc(100vh - 260px)" }}
+            >
+              <div>
+                <img src={NotFoundLogo} alt="Logo" style={{ width: "430px" }} />
+                <h3 className="mt-7 text-center">No Products Found</h3>
+              </div>
+            </div>
+          )}
           {total > 12 && (
             <Pagination
               activePage={paginate?.page}

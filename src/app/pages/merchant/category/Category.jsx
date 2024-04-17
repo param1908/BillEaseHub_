@@ -17,6 +17,7 @@ import SweetAlert from "react-bootstrap-sweetalert";
 import { useNavigate } from "react-router-dom";
 import Pagination from "react-js-pagination";
 import MainLoader from "../../../loaders/MainLoader";
+import NotFoundLogo from "../../../beh_images/not-found.png";
 
 const Category = () => {
   const [showModal, setShowModal] = useState(false);
@@ -221,7 +222,7 @@ const Category = () => {
         </div>
         <div className="card-body h-auto">
           <div className="row">
-            {categories.length &&
+            {categories.length > 0 &&
               categories.map((el, index) => {
                 return (
                   <div class="col-md-3 col-xxl-3 col-lg-12 mb-5" key={index}>
@@ -290,6 +291,21 @@ const Category = () => {
                   </div>
                 );
               })}
+            {categories.length === 0 && (
+              <div
+                className="d-flex justify-content-center align-items-center"
+                style={{ minHeight: "calc(100vh - 260px)" }}
+              >
+                <div>
+                  <img
+                    src={NotFoundLogo}
+                    alt="Logo"
+                    style={{ width: "430px" }}
+                  />
+                  <h3 className="mt-7 text-center">No Category Found</h3>
+                </div>
+              </div>
+            )}
           </div>
         </div>
         {total > 12 && (

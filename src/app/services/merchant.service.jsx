@@ -191,3 +191,15 @@ export const updateUserDetailsApi = async (payload) => {
     throw error;
   }
 };
+
+export const getAllCustomerBillsApi = async (payload) => {
+  try {
+    const userResponse = await axiosApi.post(
+      "/v1/merchant/get-bill-template",
+      payload
+    );
+    return userResponse?.data;
+  } catch (error) {
+    throw error;
+  }
+};

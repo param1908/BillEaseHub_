@@ -21,6 +21,7 @@ import { getUserDetailsByToken } from "../../../services/common.service";
 import { useDispatch } from "react-redux";
 import { storeUserDetails } from "../../../store/slice/user.slice";
 import MainLoader from "../../../loaders/MainLoader";
+import NotFoundLogo from "../../../beh_images/not-found.png";
 
 const Tax = () => {
   const navigate = useNavigate();
@@ -288,124 +289,141 @@ const Tax = () => {
 
         {userDetails?.user?.merchantData?.GSTIN && (
           <div className="card-body h-auto">
-            <div className="card-body py-4">
-              <div className="table-responsive">
-                <table
-                  id="kt_table_users"
-                  className="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer"
-                  role="table"
-                >
-                  <thead>
-                    <tr className="text-start text-muted fw-bolder fs-7 text-uppercase gs-0">
-                      <th
-                        colspan="1"
-                        role="columnheader"
-                        className="min-w-125px"
-                      >
-                        No.
-                      </th>
-                      <th
-                        colspan="1"
-                        role="columnheader"
-                        className="min-w-125px"
-                      >
-                        Tax Name
-                      </th>
-                      <th
-                        colspan="1"
-                        role="columnheader"
-                        className="min-w-125px"
-                      >
-                        Tax Value
-                      </th>
-                      <th
-                        colspan="1"
-                        role="columnheader"
-                        className="min-w-125px"
-                      >
-                        CREATED DATE
-                      </th>
-                      <th
-                        colspan="1"
-                        role="columnheader"
-                        className="text-center min-w-100px"
-                      >
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-gray-600 fw-bold" role="rowgroup">
-                    {tax.length &&
-                      tax.map((el, index) => {
-                        return (
-                          <tr role="row" key={index}>
-                            <td role="cell" className="text-capitalize">
-                              {(paginate?.page - 1) * 10 + (index + 1)}
-                            </td>
-                            <td role="cell" className="">
-                              <div className="d-flex align-items-center">
-                                <div className="d-flex flex-column">
-                                  <a className="text-gray-800 text-hover-primary mb-1 text-capitalize cursor-pointer">
-                                    {el?.name}
-                                  </a>
+            {tax.length > 0 && (
+              <div className="card-body py-4">
+                <div className="table-responsive">
+                  <table
+                    id="kt_table_users"
+                    className="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer"
+                    role="table"
+                  >
+                    <thead>
+                      <tr className="text-start text-muted fw-bolder fs-7 text-uppercase gs-0">
+                        <th
+                          colspan="1"
+                          role="columnheader"
+                          className="min-w-125px"
+                        >
+                          No.
+                        </th>
+                        <th
+                          colspan="1"
+                          role="columnheader"
+                          className="min-w-125px"
+                        >
+                          Tax Name
+                        </th>
+                        <th
+                          colspan="1"
+                          role="columnheader"
+                          className="min-w-125px"
+                        >
+                          Tax Value
+                        </th>
+                        <th
+                          colspan="1"
+                          role="columnheader"
+                          className="min-w-125px"
+                        >
+                          CREATED DATE
+                        </th>
+                        <th
+                          colspan="1"
+                          role="columnheader"
+                          className="text-center min-w-100px"
+                        >
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-gray-600 fw-bold" role="rowgroup">
+                      {tax.length &&
+                        tax.map((el, index) => {
+                          return (
+                            <tr role="row" key={index}>
+                              <td role="cell" className="text-capitalize">
+                                {(paginate?.page - 1) * 10 + (index + 1)}
+                              </td>
+                              <td role="cell" className="">
+                                <div className="d-flex align-items-center">
+                                  <div className="d-flex flex-column">
+                                    <a className="text-gray-800 text-hover-primary mb-1 text-capitalize cursor-pointer">
+                                      {el?.name}
+                                    </a>
+                                  </div>
                                 </div>
-                              </div>
-                            </td>
-                            <td role="cell" className="">
-                              {el?.tax}%
-                            </td>
-                            <td role="cell" className="">
-                              <div className="badge badge-light fw-bolder">
-                                {moment(el?.createdAt).format("DD-MM-YYYY")}
-                              </div>
-                            </td>
+                              </td>
+                              <td role="cell" className="">
+                                {el?.tax}%
+                              </td>
+                              <td role="cell" className="">
+                                <div className="badge badge-light fw-bolder">
+                                  {moment(el?.createdAt).format("DD-MM-YYYY")}
+                                </div>
+                              </td>
 
-                            <td
-                              role="cell"
-                              className="text-end min-w-100px d-flex justify-content-center"
-                            >
-                              <a
-                                className="btn btn-light btn-active-light-primary btn-sm d-flex align-items-center cursor-pointer"
-                                data-kt-menu-trigger="click"
-                                data-kt-menu-placement="bottom-end"
-                                style={{ maxWidth: "100px" }}
+                              <td
+                                role="cell"
+                                className="text-end min-w-100px d-flex justify-content-center"
                               >
-                                Actions
-                                <i className="ki-duotone ki-down fs-5 m-0 ms-2"></i>
-                              </a>
-                              <div
-                                className="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4"
-                                data-kt-menu="true"
-                              >
-                                <div className="menu-item px-3">
-                                  <a
-                                    className="menu-link px-3"
-                                    onClick={() => handleEdit(el)}
-                                  >
-                                    Edit
-                                  </a>
+                                <a
+                                  className="btn btn-light btn-active-light-primary btn-sm d-flex align-items-center cursor-pointer"
+                                  data-kt-menu-trigger="click"
+                                  data-kt-menu-placement="bottom-end"
+                                  style={{ maxWidth: "100px" }}
+                                >
+                                  Actions
+                                  <i className="ki-duotone ki-down fs-5 m-0 ms-2"></i>
+                                </a>
+                                <div
+                                  className="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4"
+                                  data-kt-menu="true"
+                                >
+                                  <div className="menu-item px-3">
+                                    <a
+                                      className="menu-link px-3"
+                                      onClick={() => handleEdit(el)}
+                                    >
+                                      Edit
+                                    </a>
+                                  </div>
+                                  <div className="menu-item px-3">
+                                    <a
+                                      className="menu-link px-3"
+                                      data-kt-users-table-filter="delete_row"
+                                      onClick={() => {
+                                        setShowAlert(true);
+                                        setTempId(el?._id);
+                                      }}
+                                    >
+                                      Delete
+                                    </a>
+                                  </div>
                                 </div>
-                                <div className="menu-item px-3">
-                                  <a
-                                    className="menu-link px-3"
-                                    data-kt-users-table-filter="delete_row"
-                                    onClick={() => {
-                                      setShowAlert(true);
-                                      setTempId(el?._id);
-                                    }}
-                                  >
-                                    Delete
-                                  </a>
-                                </div>
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                  </tbody>
-                </table>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
+            )}
+            {tax.length === 0 && (
+              <div
+                className="d-flex justify-content-center align-items-center"
+                style={{ minHeight: "calc(100vh - 260px)" }}
+              >
+                <div>
+                  <img
+                    src={NotFoundLogo}
+                    alt="Logo"
+                    style={{ width: "430px" }}
+                  />
+                  <h3 className="mt-7 text-center">No Tax Found</h3>
+                </div>
+              </div>
+            )}
             {total > 12 && (
               <Pagination
                 activePage={paginate?.page}

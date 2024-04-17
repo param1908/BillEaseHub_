@@ -1,6 +1,11 @@
+import moment from "moment";
 import React from "react";
+import { useLocation } from "react-router-dom";
 
 const CustomerDetails = () => {
+  const location = useLocation();
+  const data = location.state;
+  console.log("data", data);
   return (
     <>
       <div id="kt_app_content" className="app-content  flex-column-fluid">
@@ -11,27 +16,51 @@ const CustomerDetails = () => {
                 <div class="card-body pt-15">
                   <div class="d-flex flex-center flex-column mb-5">
                     <div class="symbol symbol-100px symbol-circle mb-7">
-                      <img
-                        src="/metronic8/demo1/assets/media/avatars/300-1.jpg"
-                        alt="image"
-                      />
+                      {data?.profilePic ? (
+                        <img src={data?.profilePic} alt="image" />
+                      ) : (
+                        <div
+                          className="text-uppercase d-flex justify-content-center align-items-center"
+                          style={{
+                            width: "160px",
+                            height: "160px",
+                            borderRadius: "50%",
+                            backgroundColor: "#868fa7 ",
+                            color: "#f9f9f9",
+                            fontSize: "50px",
+                          }}
+                        >
+                          {data.fullName[0]}
+                        </div>
+                      )}
                     </div>
                     <a
                       href="#"
-                      class="fs-3 text-gray-800 text-hover-primary fw-bold mb-5"
+                      class="fs-3 text-gray-800 text-hover-primary fw-bold mb-5 text-capitalize"
                     >
-                      Max Smith{" "}
+                      {data.fullName}{" "}
                     </a>
                     <div class="d-flex flex-wrap flex-center">
                       <div class="border border-gray-300 border-dashed rounded py-3 px-3 mb-3 text-center">
                         <div class="fs-4 fw-bold text-gray-700">
-                          <span class="w-75px">₹6,900</span>
+                          <span class="w-75px">
+                            {(() => {
+                              let total = 0;
+                              data?.billsData.forEach((el) => {
+                                total += parseFloat(el.total);
+                                console.log("eee", el.total);
+                              });
+                              return <>₹{total}</>;
+                            })()}
+                          </span>
                         </div>
                         <div class="fw-semibold text-muted">Total Paid</div>
                       </div>
                       <div class="border border-gray-300 border-dashed rounded py-3 px-3 mx-4 mb-3 text-center">
                         <div class="fs-4 fw-bold text-gray-700">
-                          <span class="w-50px">130</span>
+                          <span class="w-50px">
+                            {data?.billsData?.length || 0}
+                          </span>
                         </div>
                         <div class="fw-semibold text-muted">Invoices</div>
                       </div>
@@ -50,15 +79,19 @@ const CustomerDetails = () => {
                   <div id="kt_customer_view_details" class="collapse show">
                     <div class="py-5 fs-6">
                       <div class="fw-bold">Phone No.</div>
-                      <div class="text-gray-600">+91 1234567890</div>
+                      <div class="text-gray-600">+91 {data?.phone}</div>
                       <div class="fw-bold mt-5">Email Address</div>
                       <div class="text-gray-600">
                         <a href="#" class="text-gray-600 text-hover-primary">
-                          info@keenthemes.com
+                          {data?.email ? data?.email : "-"}
                         </a>
                       </div>
                       <div class="fw-bold mt-5">Last Invoice Date</div>
-                      <div class="text-gray-600">54238-8693</div>
+                      <div class="text-gray-600">
+                        {moment(data?.billsData[0]?.updatedAt).format(
+                          "DD-MM-YYYY"
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -81,10 +114,6 @@ const CustomerDetails = () => {
                         data-kt-user-table-filter="search"
                         className="form-control form-control-solid w-250px ps-14"
                         placeholder="Search Invoice"
-                        // onKeyUp={(e) => {
-                        //   setPaginate({ ...paginate, page: 1 });
-                        //   setSearch(e.target.value);
-                        // }}
                       />
                     </div>
                   </div>
@@ -149,6 +178,7 @@ const CustomerDetails = () => {
                                   colspan="1"
                                   aria-label="Status: Activate to sort"
                                   tabindex="0"
+                                  style={{ width: "322px" }}
                                 >
                                   <span class="dt-column-title" role="button">
                                     payment Method
@@ -181,34 +211,40 @@ const CustomerDetails = () => {
                               </tr>
                             </thead>
                             <tbody class="fs-6 fw-semibold text-gray-600">
-                              <tr>
-                                <td data-order="Invalid date">
-                                  <a
-                                    href="#"
-                                    class="text-gray-600 text-hover-primary"
-                                  >
-                                    102445788
-                                  </a>
-                                </td>
-                                <td class="text-success dt-type-numeric">
-                                  ₹38.00
-                                </td>
-                                <td>
-                                  <span class="badge badge-light-success">
-                                    Cash
-                                  </span>
-                                </td>
-                                <td>Nov 01, 2020</td>
-                                <td class="text-end">
-                                  <button class="btn btn-sm btn-light btn-active-light-primary">
-                                    Download
-                                  </button>
-                                </td>
-                              </tr>
+                              {data?.billsData?.map((el) => {
+                                return (
+                                  <tr>
+                                    <td data-order="Invalid date">
+                                      <a
+                                        href="#"
+                                        class="text-gray-600 text-hover-primary"
+                                      >
+                                        {el?._id}
+                                      </a>
+                                    </td>
+                                    <td class="text-success dt-type-numeric">
+                                      {el?.total}
+                                    </td>
+                                    <td>
+                                      <span class="badge badge-light-success">
+                                        {el?.paymentMethod}
+                                      </span>
+                                    </td>
+                                    <td>
+                                      {moment(el?.updatedAt).format(
+                                        "DD-MM-YYYY"
+                                      )}
+                                    </td>
+                                    <td class="text-end">
+                                      <button class="btn btn-sm btn-light btn-active-light-primary">
+                                        Download
+                                      </button>
+                                    </td>
+                                  </tr>
+                                );
+                              })}
                             </tbody>
-                            <tfoot>
-                              {/* Dhruvik here add paginatio ok */}
-                            </tfoot>
+                            <tfoot>{/* Dhruvik here add paginatio ok */}</tfoot>
                           </table>
                         </div>
                       </div>

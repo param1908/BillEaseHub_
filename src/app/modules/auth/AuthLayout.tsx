@@ -4,6 +4,7 @@ import { Outlet, Link, useLocation } from "react-router-dom";
 import { toAbsoluteUrl } from "../../../_metronic/helpers";
 import BEHLoginVector from "../../beh_images/login-vector.png";
 import BEHSignupVector from "../../beh_images/signup-vector.png";
+import BEHForgotPasswordVector from "../../beh_images/forgot-password.png";
 import BEHLogo from "../../beh_images/behlogo-green-white.png";
 
 const AuthLayout = () => {
@@ -44,6 +45,12 @@ const AuthLayout = () => {
                 <img
                   alt="Logo"
                   src={BEHLoginVector}
+                  style={{ height: "430px" }}
+                />
+              ) : location.pathname === "/auth/forgot-password" ? (
+                <img
+                  alt="Logo"
+                  src={BEHForgotPasswordVector}
                   style={{ height: "430px" }}
                 />
               ) : (
