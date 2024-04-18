@@ -22,6 +22,7 @@ import { useDispatch } from "react-redux";
 import { storeUserDetails } from "../../../store/slice/user.slice";
 import MainLoader from "../../../loaders/MainLoader";
 import NotFoundLogo from "../../../beh_images/not-found.png";
+import TaxLogo from "../../../beh_images/tax-logo.png";
 
 const Tax = () => {
   const navigate = useNavigate();
@@ -234,8 +235,12 @@ const Tax = () => {
           </div>
         </div>
         {!userDetails?.user?.merchantData?.GSTIN && (
-          <div className="d-flex justify-content-center align-items-center my-10">
-            <div className="d-flex align-items-start">
+          <div
+            className="my-10 d-flex justify-content-center flex-column align-items-center"
+            style={{ height: "calc(100vh - 280px)" }}
+          >
+            <img src={TaxLogo} alt="Logo" style={{ width: "370px" }} />
+            <div className="d-flex align-items-start mt-7">
               <div className="me-5">
                 <div className="fv-row mb-8">
                   <input

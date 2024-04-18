@@ -1,11 +1,60 @@
 import moment from "moment";
-import React from "react";
-import { useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const CustomerDetails = () => {
   const location = useLocation();
   const data = location.state;
-  console.log("data", data);
+  const navigate = useNavigate();
+
+  const handleBillData = (el) => {
+    try {
+      console.log("first, el", el);
+      const prepareObject = {
+        name: el?.customerName ? el?.customerName : "",
+        phone: data?.phone,
+        email: el?.customerEmail ? el?.customerEmail : "",
+        notes: el?.notes ? el?.notes : "",
+        invoiceDate: el?.billDate ? el?.billDate : "",
+        paymentMethod: { label: el?.paymentMethod },
+        addDiscount: el?.discount,
+        products: [],
+        taxFields: [],
+        billCount: el?._id,
+        subTotalCount: el?.subTotal ? el?.subTotal : 0,
+        discountCount: el?.discountCount ? el?.discountCount : 0,
+        total: el?.total ? el?.total : 0,
+        templateId: el?.templateId,
+        isShowTemplateSelection: true,
+      };
+      if (el?.products?.length) {
+        el?.products?.forEach((el) => {
+          prepareObject.products.push({
+            category: { label: el?.categoryName },
+            product: { label: el?.productName },
+            quantity: el?.productquantity,
+            price: el?.productprice,
+            total: el?.productTotal,
+          });
+        });
+      }
+      let total = el?.total;
+      if (el?.taxFields?.length) {
+        el?.taxFields?.forEach((el) => {
+          prepareObject.taxFields.push({
+            name: { label: el?.taxName, tax: el?.value },
+            totalTaxCount: JSON.parse(
+              JSON.stringify(
+                Math.floor((parseFloat(total) * parseFloat(el?.value)) / 100)
+              )
+            ),
+          });
+        });
+      }
+      navigate("/merchant/bill-templates", { state: prepareObject });
+    } catch (error) {}
+  };
+
   return (
     <>
       <div id="kt_app_content" className="app-content  flex-column-fluid">
@@ -34,10 +83,7 @@ const CustomerDetails = () => {
                         </div>
                       )}
                     </div>
-                    <a
-                      href="#"
-                      class="fs-3 text-gray-800 text-hover-primary fw-bold mb-5 text-capitalize"
-                    >
+                    <a class="fs-3 text-gray-800 fw-bold mb-5 text-capitalize">
                       {data.fullName}{" "}
                     </a>
                     <div class="d-flex flex-wrap flex-center">
@@ -102,20 +148,6 @@ const CustomerDetails = () => {
                 <div class="card-header border-0">
                   <div class="card-title">
                     <h2>Invoices</h2>
-                  </div>
-                  <div className="d-flex">
-                    <div className="d-flex align-items-center position-relative my-1 me-md-2">
-                      <i className="ki-duotone ki-magnifier fs-1 position-absolute ms-6">
-                        <span className="path1"></span>
-                        <span className="path2"></span>
-                      </i>
-                      <input
-                        type="text"
-                        data-kt-user-table-filter="search"
-                        className="form-control form-control-solid w-250px ps-14"
-                        placeholder="Search Invoice"
-                      />
-                    </div>
                   </div>
                 </div>
                 <div class="card-body pt-0">
@@ -216,8 +248,10 @@ const CustomerDetails = () => {
                                   <tr>
                                     <td data-order="Invalid date">
                                       <a
-                                        href="#"
-                                        class="text-gray-600 text-hover-primary"
+                                        class="text-gray-600 text-hover-primary cursor-pointer"
+                                        onClick={() => {
+                                          handleBillData(el);
+                                        }}
                                       >
                                         {el?._id}
                                       </a>
