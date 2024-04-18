@@ -1,15 +1,101 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Select from "react-select";
+import { getAllInvoiceApi } from "../../../services/merchant.service";
+import Pagination from "react-js-pagination";
+import NotFoundLogo from "../../../beh_images/not-found.png";
+import MainLoader from "../../../loaders/MainLoader";
+import moment from "moment";
+import clsx from "clsx";
 
 const Invoices = () => {
   const filterOptions = [
-    { value: "chocolate", label: "Today's invoices" },
-    { value: "strawberry", label: "Last seven days invoices" },
-    { value: "vanilla", label: "Last one month's invoices" },
-    { value: "vanilla1", label: "Last six month's invoices" },
-    { value: "vanilla2", label: "Last one years invoices" },
+    { value: "chocolate", label: "Today" },
+    { value: "strawberry", label: "Last seven days" },
+    { value: "vanilla", label: "Last one month" },
+    { value: "vanilla1", label: "Last six month" },
+    { value: "vanilla2", label: "Last one years" },
     { value: "vanill3", label: "All invoices" },
   ];
+  const navigate = useNavigate();
+  const [search, setSearch] = useState();
+  const [loading, setLoading] = useState(false);
+  const [paginate, setPaginate] = useState({ limit: 4, page: 1 });
+  const [invoice, setInvoice] = useState([]);
+  const [total, setTotal] = useState(0);
+
+  useEffect(() => {
+    !search && setLoading(true);
+    getAllInvoices();
+  }, [search, paginate]);
+
+  const handlePageChange = (pageNumber) => {
+    setPaginate({ ...paginate, page: pageNumber });
+  };
+
+  const getAllInvoices = async () => {
+    try {
+      let payload = {
+        ...paginate,
+        fromDate: "10/04/2024",
+        toDate: "14/04/2024",
+      };
+      if (search) payload = { ...payload, search };
+      const invoices = await getAllInvoiceApi(payload);
+      console.log("invoices", invoices);
+      setInvoice(invoices?.data?.getBillTemplateData);
+      setTotal(invoices?.data?.totalBills);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.log("err", error);
+    }
+  };
+
+  const navigeteBillTemplate = (el) => {
+    const prepareObject = {
+      name: el?.customerName ? el?.customerName : "",
+      phone: el?.customerData?.userData?.phoneNumber,
+      email: el?.customerEmail ? el?.customerEmail : "",
+      notes: el?.notes ? el?.notes : "",
+      invoiceDate: el?.billDate ? el?.billDate : "",
+      paymentMethod: { label: el?.paymentMethod },
+      addDiscount: el?.discount,
+      products: [],
+      taxFields: [],
+      billCount: el?._id,
+      subTotalCount: el?.subTotal ? el?.subTotal : 0,
+      discountCount: el?.discountCount ? el?.discountCount : 0,
+      total: el?.total ? el?.total : 0,
+      templateId: el?.templateId,
+      isShowTemplateSelection: true,
+    };
+    if (el?.products?.length) {
+      el?.products?.forEach((el) => {
+        prepareObject.products.push({
+          category: { label: el?.categoryName },
+          product: { label: el?.productName },
+          quantity: el?.productquantity,
+          price: el?.productprice,
+          total: el?.productTotal,
+        });
+      });
+    }
+    let total = el?.total;
+    if (el?.taxFields?.length) {
+      el?.taxFields?.forEach((el) => {
+        prepareObject.taxFields.push({
+          name: { label: el?.taxName, tax: el?.value },
+          totalTaxCount: JSON.parse(
+            JSON.stringify(
+              Math.floor((parseFloat(total) * parseFloat(el?.value)) / 100)
+            )
+          ),
+        });
+      });
+    }
+    navigate("/merchant/bill-templates", { state: prepareObject });
+  };
 
   return (
     <>
@@ -20,10 +106,7 @@ const Invoices = () => {
         <div className="card-header">
           <div className="card-title m-0 d-flex justify-content-between w-100">
             <h3 className="fw-bolder m-0 d-flex align-items-center">
-              <p className="mb-0">
-                {/* {catId ? catName + "'s" : "ALL"} Products [ {total} ] */}
-                ALL Invoices [100]
-              </p>
+              <p className="mb-0">ALL Invoices [{total || 0}]</p>
             </h3>
             <div className="d-flex">
               <div className="card-toolbar me-md-2">
@@ -45,94 +128,132 @@ const Invoices = () => {
                   data-kt-user-table-filter="search"
                   className="form-control form-control-solid w-250px ps-14"
                   placeholder="Search Invoice"
-                  //   onKeyUp={(e) => {
-                  //     setPaginate({ ...paginate, page: 1 });
-                  //     setSearch(e.target.value);
-                  //   }}
+                  onKeyUp={(e) => {
+                    setPaginate({ ...paginate, page: 1 });
+                    setSearch(e.target.value);
+                  }}
                 />
               </div>
             </div>
           </div>
         </div>
         <div className="card-body h-auto">
-          {/* {products.length > 0 && ( */}
-          <div className="card-body py-4">
-            <div className="table-responsive">
-              <table
-                id="kt_table_users"
-                className="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer"
-                role="table"
-              >
-                <thead>
-                  <tr className="text-start text-muted fw-bolder fs-7 text-uppercase gs-0">
-                    <th colspan="1" role="columnheader" className="min-w-125px">
-                      Name
-                    </th>
-                    <th colspan="1" role="columnheader" className="min-w-125px">
-                      Email
-                    </th>
-                    <th colspan="1" role="columnheader" className="min-w-125px">
-                      Phone
-                    </th>
-                    <th colspan="1" role="columnheader" className="min-w-125px">
-                      Amount
-                    </th>
-                    <th colspan="1" role="columnheader" className="min-w-125px">
-                      Payment Method
-                    </th>
-                    <th colspan="1" role="columnheader" className="min-w-125px">
-                      CREATED DATE
-                    </th>
-                    <th
-                      colspan="1"
-                      role="columnheader"
-                      className="text-center min-w-100px"
-                    >
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="text-gray-600 fw-bold" role="rowgroup">
-                  {/* {products.length && */}
-                  {/* //   products.map((el, index) => { */}
-                  {/* // return ( */}
-                  <tr role="row">
-                    <td role="cell" className="">
-                      Test invoice
-                    </td>
-                    <td role="cell" className="">
-                      test@yopmail.com
-                    </td>
-                    <td role="cell" className="text-capitalize">
-                      +91 1234567890
-                    </td>
-                    <td role="cell" className="text-capitalize">
-                      ₹2,000
-                    </td>
-                    <td role="cell" className="">
-                      Online
-                    </td>
-                    <td role="cell" className="">
-                      <div className="badge badge-light fw-bolder">
-                        17/04/2024
-                        {/* {moment(el?.createdAt).format("DD-MM-YYYY")} */}
-                      </div>
-                    </td>
-                    <td
-                      role="cell"
-                      className="text-end min-w-100px d-flex justify-content-center"
-                    >
-                      View
-                    </td>
-                  </tr>
-                  {/* // ); */}
-                  {/* //   })} */}
-                </tbody>
-              </table>
+          {invoice.length > 0 && (
+            <div className="card-body py-4">
+              <div className="table-responsive">
+                <table
+                  id="kt_table_users"
+                  className="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer"
+                  role="table"
+                >
+                  <thead>
+                    <tr className="text-start text-muted fw-bolder fs-7 text-uppercase gs-0">
+                      <th
+                        colspan="1"
+                        role="columnheader"
+                        className="min-w-125px"
+                      >
+                        Name
+                      </th>
+                      <th
+                        colspan="1"
+                        role="columnheader"
+                        className="min-w-125px"
+                      >
+                        Email
+                      </th>
+                      <th
+                        colspan="1"
+                        role="columnheader"
+                        className="min-w-125px"
+                      >
+                        Phone
+                      </th>
+                      <th
+                        colspan="1"
+                        role="columnheader"
+                        className="min-w-125px"
+                      >
+                        Amount
+                      </th>
+                      <th
+                        colspan="1"
+                        role="columnheader"
+                        className="min-w-125px"
+                      >
+                        Payment Method
+                      </th>
+                      <th
+                        colspan="1"
+                        role="columnheader"
+                        className="min-w-125px"
+                      >
+                        CREATED DATE
+                      </th>
+                      <th
+                        colspan="1"
+                        role="columnheader"
+                        className="text-center min-w-100px"
+                      >
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-gray-600 fw-bold" role="rowgroup">
+                    {invoice.length &&
+                      invoice.map((el, index) => {
+                        return (
+                          <tr role="row">
+                            <td role="cell" className="text-capitalize">
+                              {el?.customerName}
+                            </td>
+                            <td role="cell" className="">
+                              {el?.customerEmail}
+                            </td>
+                            <td role="cell" className="text-capitalize">
+                              +91 {el?.customerData?.userData?.phoneNumber}
+                            </td>
+                            <td role="cell" className="text-capitalize">
+                              ₹{el?.total}
+                            </td>
+                            <td role="cell" className="">
+                              <span
+                                className={clsx(
+                                  "badge badge-light-success",
+                                  el?.paymentMethod === "Online" &&
+                                    "badge-light-warning"
+                                )}
+                              >
+                                {el?.paymentMethod}
+                              </span>
+                            </td>
+                            <td role="cell" className="">
+                              <div className="badge badge-light fw-bolder">
+                                {moment(el?.createdAt).format("DD-MM-YYYY")}
+                              </div>
+                            </td>
+                            <td
+                              role="cell"
+                              className="text-end min-w-100px d-flex justify-content-center"
+                            >
+                              <a
+                                className="btn btn-sm btn-light-primary py-3 cursor-pointer"
+                                onClick={() => {
+                                  navigeteBillTemplate(el);
+                                }}
+                              >
+                                View
+                              </a>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-          {/*   )} */}
-          {/* {products.length === 0 && (
+          )}
+          {invoice.length === 0 && (
             <div
               className="d-flex justify-content-center align-items-center"
               style={{ minHeight: "calc(100vh - 260px)" }}
@@ -142,8 +263,8 @@ const Invoices = () => {
                 <h3 className="mt-7 text-center">No Products Found</h3>
               </div>
             </div>
-          )} */}
-          {/* {total > 12 && (
+          )}
+          {total > 4 && (
             <Pagination
               activePage={paginate?.page}
               itemsCountPerPage={paginate?.limit}
@@ -153,9 +274,10 @@ const Invoices = () => {
               itemClass="page-item"
               linkClass="page-link"
             />
-          )} */}
+          )}
         </div>
       </div>
+      {loading && <MainLoader />}
     </>
   );
 };

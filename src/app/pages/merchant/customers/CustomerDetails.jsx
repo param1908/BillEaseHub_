@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import moment from "moment";
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -260,7 +261,13 @@ const CustomerDetails = () => {
                                       {el?.total}
                                     </td>
                                     <td>
-                                      <span class="badge badge-light-success">
+                                      <span
+                                        className={clsx(
+                                          "badge badge-light-success",
+                                          el?.paymentMethod === "Online" &&
+                                            "badge-light-warning"
+                                        )}
+                                      >
                                         {el?.paymentMethod}
                                       </span>
                                     </td>

@@ -16,14 +16,14 @@ const Customer = () => {
 
   useEffect(() => {
     !search && setLoading(true);
-    getALlCustomerBills();
+    getAllCustomerBills();
   }, [search, paginate]);
 
   const handlePageChange = (pageNumber) => {
     setPaginate({ ...paginate, page: pageNumber });
   };
 
-  const getALlCustomerBills = async () => {
+  const getAllCustomerBills = async () => {
     try {
       let payload = {
         ...paginate,

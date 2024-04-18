@@ -203,3 +203,15 @@ export const getAllCustomerBillsApi = async (payload) => {
     throw error;
   }
 };
+
+export const getAllInvoiceApi = async (payload) => {
+  try {
+    const userResponse = await axiosApi.post(
+      "/v1/merchant/customer-bills",
+      payload
+    );
+    return userResponse?.data;
+  } catch (error) {
+    throw error;
+  }
+};
