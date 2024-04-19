@@ -9,20 +9,65 @@ import moment from "moment";
 import clsx from "clsx";
 
 const Invoices = () => {
+  const lastSevenDays = [];
+  const todayDate = moment().format("DD/MM/YYYY");
+  const currentDate = moment();
+  for (let i = 0; i < 7; i++) {
+    const date = moment().subtract(i, "days").format("DD/MM/YYYY");
+    lastSevenDays.push(date);
+  }
+
   const filterOptions = [
-    { value: "chocolate", label: "Today" },
-    { value: "strawberry", label: "Last seven days" },
-    { value: "vanilla", label: "Last one month" },
-    { value: "vanilla1", label: "Last six month" },
-    { value: "vanilla2", label: "Last one years" },
-    { value: "vanill3", label: "All invoices" },
+    {
+      value: 1,
+      label: "Today",
+      fromDate: todayDate,
+      toDate: "",
+    },
+    {
+      value: 2,
+      label: "Last 7 days",
+      date: lastSevenDays,
+      fromDate: lastSevenDays[lastSevenDays.length - 1],
+      toDate: lastSevenDays[0],
+    },
+    {
+      value: 3,
+      label: "Last 1 month",
+      fromDate: currentDate
+        .clone()
+        .subtract(1, "month")
+        .startOf("month")
+        .format("DD/MM/YYYY"),
+      toDate: todayDate,
+    },
+    {
+      value: 4,
+      label: "Last 6 month",
+      fromDate: moment()
+        .subtract(6, "months")
+        .startOf("month")
+        .format("DD/MM/YYYY"),
+      toDate: todayDate,
+    },
+    {
+      value: 5,
+      label: "Last 1 year",
+      fromDate: moment()
+        .startOf("month")
+        .subtract(1, "year")
+        .format("DD/MM/YYYY"),
+      toDate: todayDate,
+    },
+    { value: 6, label: "All invoices", fromDate: "", toDate: "" },
   ];
   const navigate = useNavigate();
   const [search, setSearch] = useState();
   const [loading, setLoading] = useState(false);
-  const [paginate, setPaginate] = useState({ limit: 4, page: 1 });
+  const [paginate, setPaginate] = useState({ limit: 12, page: 1 });
   const [invoice, setInvoice] = useState([]);
   const [total, setTotal] = useState(0);
+  const [filter, setFilter] = useState(filterOptions[1]);
 
   useEffect(() => {
     !search && setLoading(true);
@@ -34,11 +79,12 @@ const Invoices = () => {
   };
 
   const getAllInvoices = async () => {
+    console.log("first", filter);
     try {
       let payload = {
         ...paginate,
-        fromDate: "10/04/2024",
-        toDate: "14/04/2024",
+        fromDate: filter?.fromDate,
+        toDate: filter?.toDate,
       };
       if (search) payload = { ...payload, search };
       const invoices = await getAllInvoiceApi(payload);
@@ -97,6 +143,12 @@ const Invoices = () => {
     navigate("/merchant/bill-templates", { state: prepareObject });
   };
 
+  const handleFilterChange = (e) => {
+    console.log("eee", e);
+    setFilter(e);
+    setPaginate({ ...paginate, page: 1 });
+  };
+
   return (
     <>
       <div
@@ -109,13 +161,14 @@ const Invoices = () => {
               <p className="mb-0">ALL Invoices [{total || 0}]</p>
             </h3>
             <div className="d-flex">
-              <div className="card-toolbar me-md-2">
+              <div className="card-toolbar me-md-2" style={{ width: "200px" }}>
                 <Select
                   className="form-control bg-transparent beh-select"
                   classNamePrefix="select"
-                  defaultValue={filterOptions[0]}
+                  value={filter}
                   name="filter"
                   options={filterOptions}
+                  onChange={(e) => handleFilterChange(e)}
                 />
               </div>
               <div className="d-flex align-items-center position-relative my-1">
@@ -264,7 +317,7 @@ const Invoices = () => {
               </div>
             </div>
           )}
-          {total > 4 && (
+          {total > 12 && (
             <Pagination
               activePage={paginate?.page}
               itemsCountPerPage={paginate?.limit}
