@@ -6,15 +6,16 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { createBillTemplateApi } from "../../../services/merchant.service";
 import { toast } from "react-toastify";
 import clsx from "clsx";
+import MainLoader from "../../../loaders/MainLoader";
 
 const BillTemplates = () => {
   const location = useLocation();
   const data = location.state;
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState("Template1");
   const [isShowTemplateSelection, setIsShowTemplateSelection] = useState(false);
 
-  console.log("dddd", data);
   useEffect(() => {
     if (data?.isShowTemplateSelection) {
       setIsShowTemplateSelection(data?.isShowTemplateSelection);
@@ -23,6 +24,7 @@ const BillTemplates = () => {
   }, []);
 
   const sendInvoice = async () => {
+    setLoading(true);
     try {
       console.log("sendInvoice", data);
       const prepareObject = {
@@ -66,9 +68,10 @@ const BillTemplates = () => {
         toast.success(response?.message);
         navigate("/merchant/generate-invoice");
       }
+      setLoading(false);
       if (data.email) prepareObject.email = data.email;
     } catch (error) {
-      console.log("err", error);
+      setLoading(false);
     }
   };
 
@@ -208,6 +211,7 @@ const BillTemplates = () => {
           </div>
         )}
       </div>
+      {loading && <MainLoader />}
     </>
   );
 };

@@ -23,7 +23,7 @@ const EngageWidget10 = ({ className }: Props) => {
         }}
       >
         <div>
-          <div className="fs-2hx fw-bold text-gray-800 text-center mt-md-13 mb-13 mb-xl-0">
+          <div className="fs-2hx fw-bold text-gray-800 text-center mt-md-6 mb-13 mb-xl-0">
             <span className="me-2">
               Welcome <br />
               <span className="position-relative d-inline-block text-success">

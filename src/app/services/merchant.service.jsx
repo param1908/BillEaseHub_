@@ -215,3 +215,25 @@ export const getAllInvoiceApi = async (payload) => {
     throw error;
   }
 };
+
+export const getDashboardCustomerBillsApi = async () => {
+  try {
+    const userResponse = await axiosApi.get(
+      "/v1/merchant/get-dashboard-customers-data"
+    );
+    return userResponse?.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getDashboardCustomerTotalApi = async () => {
+  try {
+    const userResponse = await axiosApi.get(
+      "/v1/merchant/get-dashboard-customers-total"
+    );
+    return userResponse?.data;
+  } catch (error) {
+    throw error;
+  }
+};

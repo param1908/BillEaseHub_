@@ -66,6 +66,8 @@ const GenerateBill = () => {
     const invoiceDatePicker = flatpickr(invoiceDateRef.current, {
       dateFormat: "d/m/Y",
       defaultDate: "today",
+      minDate: "today",
+      maxDate: "today",
       onChange: function (selectedDates, dateStr, instance) {
         const date = moment(selectedDates[0]).format("DD/MM/YYYY");
         setBillDetails({ ...billDetails, invoiceDate: date });
