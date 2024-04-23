@@ -26,7 +26,6 @@ const BillTemplates = () => {
   const sendInvoice = async () => {
     setLoading(true);
     try {
-      console.log("sendInvoice", data);
       const prepareObject = {
         email: data.email,
         phone: data?.phone,
@@ -62,7 +61,6 @@ const BillTemplates = () => {
           });
         });
       }
-      console.log("prepareObj", prepareObject);
       let response = await createBillTemplateApi(prepareObject);
       if (response["ResponseCode"] == 1) {
         toast.success(response?.message);

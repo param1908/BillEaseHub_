@@ -79,7 +79,6 @@ const Invoices = () => {
   };
 
   const getAllInvoices = async () => {
-    console.log("first", filter);
     try {
       let payload = {
         ...paginate,
@@ -88,7 +87,6 @@ const Invoices = () => {
       };
       if (search) payload = { ...payload, search };
       const invoices = await getAllInvoiceApi(payload);
-      console.log("invoices", invoices);
       setInvoice(invoices?.data?.getBillTemplateData);
       setTotal(invoices?.data?.totalBills);
       setLoading(false);
@@ -144,7 +142,6 @@ const Invoices = () => {
   };
 
   const handleFilterChange = (e) => {
-    console.log("eee", e);
     setFilter(e);
     setPaginate({ ...paginate, page: 1 });
   };

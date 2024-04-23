@@ -67,7 +67,6 @@ const Product = () => {
       sortOrder: "asc",
     };
     const categoryData = await getAllCategoriesApi(payload);
-    console.log("data", categoryData);
     let catData = categoryData?.data?.categoryDetails.map((el) => {
       return { value: el._id, label: el.name };
     });
@@ -75,7 +74,6 @@ const Product = () => {
       catData = catData.filter((el) => el.value === searchValue);
     }
     setCatOptions(catData);
-    console.log("catData", catData);
   };
 
   const handleClose = () => {
@@ -83,7 +81,6 @@ const Product = () => {
   };
 
   const handleImageChange = (event) => {
-    console.log("file", event);
     const file = event.target.files[0];
     if (file) {
       const fileType = file.type;
@@ -95,7 +92,6 @@ const Product = () => {
       const reader = new FileReader();
       reader.onload = (e) => {
         const base64String = reader.result;
-        console.log("baswe", base64String);
         setSelectedImage(base64String); // Set selected image when it's loaded
       };
       reader.readAsDataURL(file);
@@ -130,7 +126,6 @@ const Product = () => {
       try {
         let response;
         if (isEdit) {
-          console.log("price", values);
           const payload = {
             productId: values?.productId,
           };
@@ -150,10 +145,8 @@ const Product = () => {
             categoryId: values?.category?.value,
             image: selectedImage,
           };
-          console.log("val", values);
           response = await addProductApi(payload);
         }
-        console.log(values, selectedImage);
 
         if (response["ResponseCode"] == 1) {
           toast.success(response?.message);
@@ -180,7 +173,6 @@ const Product = () => {
       const searchParams = new URLSearchParams(window.location.search);
       const searchValue = searchParams.get("category");
       if (searchValue) {
-        console.log("searchValue", searchValue);
         setCatId(searchValue);
         setCatName(searchParams.get("name"));
       }
@@ -200,7 +192,6 @@ const Product = () => {
     let cat = catOptions.find((obj) => obj.value === el.categoryData._id);
     setIsEdit(true);
     setSelectedImage(null);
-    console.log("el", el);
     setShowModal(true);
     formik.setValues({
       name: el?.name,
@@ -217,7 +208,6 @@ const Product = () => {
   };
 
   const deleteCategory = async () => {
-    console.log("first", tempId);
     if (tempId) {
       let response = await deleteProductApi(tempId);
       if (response["ResponseCode"] == 1) {
@@ -548,7 +538,6 @@ const Product = () => {
                           name="avatar"
                           accept=".png, .jpg, .jpeg"
                           onChange={(e) => {
-                            console.log("e", e.target.files[0]);
                             formik.setFieldValue("image", e.target.files[0]);
                             handleImageChange(e);
                           }}
