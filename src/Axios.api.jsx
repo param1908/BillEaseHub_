@@ -32,6 +32,10 @@ axiosApi.interceptors.response.use(
       console.log(" ERROR => 404 => API not available");
     } else if (error?.response?.status === 500) {
       console.log(" ERROR => 500 => Server Error");
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      toast.success("Logout successfully");
+      window.location.replace("/auth/login");
     } else if (error?.response?.status === 401) {
       console.log(" ERROR => 401 => User is not authorized");
       if (localStorage.getItem("_token")) {

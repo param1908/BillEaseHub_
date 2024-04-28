@@ -158,7 +158,7 @@ const Invoices = () => {
               <p className="mb-0">ALL Invoices [{total || 0}]</p>
             </h3>
             <div className="d-flex">
-              <div className="card-toolbar me-md-2" style={{ width: "200px" }}>
+              <div className="card-toolbar me-md-2" style={{ width: "170px" }}>
                 <Select
                   className="form-control bg-transparent beh-select"
                   classNamePrefix="select"
