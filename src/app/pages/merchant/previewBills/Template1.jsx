@@ -99,9 +99,13 @@ const Template1 = (props) => {
                           <p className="me-1 fw-semibold fs-7 text-gray-600 mb-1">
                             Phone -
                           </p>
-                          <div className="fw-bold fs-6 text-gray-800">
-                            +91 {templateData?.phone}
-                          </div>
+                          {templateData?.phone ? (
+                            <div className="fw-bold fs-6 text-gray-800">
+                              +91 {templateData?.phone}
+                            </div>
+                          ) : (
+                            <div className="fw-bold fs-6 text-gray-800">-</div>
+                          )}
                         </div>
                         {templateData?.email && (
                           <div className="d-flex">

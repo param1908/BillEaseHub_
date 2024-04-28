@@ -13,7 +13,7 @@ const CustomerDetails = () => {
       console.log("first, el", el);
       const prepareObject = {
         name: el?.customerName ? el?.customerName : "",
-        phone: data?.phone,
+        phone: el?.phoneNumber,
         email: el?.customerEmail ? el?.customerEmail : "",
         notes: el?.notes ? el?.notes : "",
         invoiceDate: el?.billDate ? el?.billDate : "",

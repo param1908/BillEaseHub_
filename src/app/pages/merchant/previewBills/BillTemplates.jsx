@@ -64,7 +64,7 @@ const BillTemplates = () => {
       let response = await createBillTemplateApi(prepareObject);
       if (response["ResponseCode"] == 1) {
         toast.success(response?.message);
-        navigate("/merchant/generate-invoice");
+        navigate("/merchant/invoices");
       }
       setLoading(false);
       if (data.email) prepareObject.email = data.email;

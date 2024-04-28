@@ -99,7 +99,7 @@ const Invoices = () => {
   const navigeteBillTemplate = (el) => {
     const prepareObject = {
       name: el?.customerName ? el?.customerName : "",
-      phone: el?.customerData?.userData?.phoneNumber,
+      phone: el?.phoneNumber,
       email: el?.customerEmail ? el?.customerEmail : "",
       notes: el?.notes ? el?.notes : "",
       invoiceDate: el?.billDate ? el?.billDate : "",
@@ -261,7 +261,7 @@ const Invoices = () => {
                               {el?.customerEmail}
                             </td>
                             <td role="cell" className="text-capitalize">
-                              +91 {el?.customerData?.userData?.phoneNumber}
+                              {el?.phoneNumber ? "+91 " + el?.phoneNumber : "-"}
                             </td>
                             <td role="cell" className="text-capitalize">
                               ₹{el?.total}
@@ -292,7 +292,7 @@ const Invoices = () => {
                                   navigeteBillTemplate(el);
                                 }}
                               >
-                                View
+                                View Invoice
                               </a>
                             </td>
                           </tr>

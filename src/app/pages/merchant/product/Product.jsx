@@ -21,6 +21,7 @@ import { useNavigate } from "react-router-dom";
 import Pagination from "react-js-pagination";
 import MainLoader from "../../../loaders/MainLoader";
 import NotFoundLogo from "../../../beh_images/not-found.png";
+import DefaultLogo from "../../../beh_images/default.jpg";
 
 const Product = () => {
   const navigate = useNavigate();
@@ -361,6 +362,9 @@ const Product = () => {
                                         src={el?.productImageUrl + el?.image}
                                         alt="logo"
                                         style={{ width: "100%" }}
+                                        onError={(e) => {
+                                          e.target.src = DefaultLogo;
+                                        }}
                                       />
                                     </div>
                                   </a>
