@@ -9,5 +9,5 @@ export const merchantItems = [
   { name: "Products", to: "/merchant/product", icon: "parcel" },
   { name: "Tax", to: "/merchant/tax", icon: "logistic" },
   { name: "Invoices", to: "/merchant/invoices", icon: "two-credit-cart" },
-  { name: "Calander", to: "/merchant/calander", icon: "calendar-tick" },
+  // { name: "Calander", to: "/merchant/calander", icon: "calendar-tick" },
 ];

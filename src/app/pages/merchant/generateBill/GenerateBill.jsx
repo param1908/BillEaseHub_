@@ -49,6 +49,8 @@ const GenerateBill = () => {
     // taxError: false,
     discError: false,
     taxFields: [],
+    total: 0,
+    subTotal: 0,
   };
   const invoiceDateRef = useRef(null);
   const navigate = useNavigate();
@@ -60,6 +62,10 @@ const GenerateBill = () => {
   const [product, setProduct] = useState([productObj]);
   const [billDetails, setBillDetails] = useState(billObj);
   const [billCount, setBillCount] = useState("0000");
+  const [changeProd, setChangeProd] = useState({});
+  const [changeCat, setChangeCat] = useState({});
+  const [changePrice, setChangePrice] = useState({});
+  const [changeQty, setChangeQty] = useState({});
 
   useEffect(() => {
     // Initialize Flatpickr
@@ -81,6 +87,39 @@ const GenerateBill = () => {
       invoiceDatePicker.destroy();
     };
   }, [invoiceDateRef]);
+
+  useEffect(() => {
+    console.log("uuuuuu", billDetails);
+    let subTotalCount = 0;
+    if (product?.length) {
+      product?.forEach((data) => {
+        subTotalCount += Number(data?.total);
+      });
+    }
+
+    let ttl = 0;
+    if (billDetails?.taxFields?.length) {
+      billDetails?.taxFields?.forEach((data) => {
+        if (data?.name && Number(data?.name?.tax) != 0) {
+          ttl += Number(data?.name?.tax);
+        }
+      });
+    }
+    if (billDetails?.enableDiscount && billDetails?.addDiscount) {
+      ttl -= Number(billDetails?.addDiscount);
+    }
+    let total = subTotalCount + (Number(subTotalCount) * ttl) / 100;
+    console.log("first", total);
+    setBillDetails({ ...billDetails, total: total, subTotal: subTotalCount });
+  }, [
+    billDetails?.taxFields,
+    billDetails?.enableDiscount,
+    billDetails?.addDiscount,
+    changeProd,
+    changeCat,
+    changePrice,
+    changeQty,
+  ]);
 
   const handleBillInput = (e) => {
     console.log("billdetails", billDetails);
@@ -373,12 +412,8 @@ const GenerateBill = () => {
       prepareObject.subTotalCount = JSON.parse(
         JSON.stringify(Math.floor(total))
       );
-      let totalTax = 0;
       if (billDetails?.taxFields?.length) {
         billDetails?.taxFields.forEach((el) => {
-          if (el?.name && el?.name?.tax != 0) {
-            totalTax += (parseFloat(total) * parseFloat(el?.name?.tax)) / 100;
-          }
           el.totalTaxCount = JSON.parse(
             JSON.stringify(
               Math.floor((parseFloat(total) * parseFloat(el?.name?.tax)) / 100)
@@ -386,16 +421,11 @@ const GenerateBill = () => {
           );
         });
       }
-      total += totalTax;
+      prepareObject.discountCount = 0;
       if (billDetails?.enableDiscount && billDetails?.addDiscount) {
-        total = total - total * (parseFloat(billDetails?.addDiscount) / 100);
+        prepareObject.discountCount =
+          total * (Number(billDetails?.addDiscount) / 100);
       }
-      prepareObject.discountCount = JSON.parse(
-        JSON.stringify(total * (parseFloat(billDetails?.addDiscount) / 100))
-      );
-      prepareObject.total = JSON.parse(
-        JSON.stringify(parseFloat(total.toFixed(2)))
-      );
       console.log("success", prepareObject);
       navigate("/merchant/bill-templates", { state: prepareObject });
     } else {
@@ -728,6 +758,7 @@ const GenerateBill = () => {
                                     placeholder={"Select Category"}
                                     onChange={(value) => {
                                       handleCategorySelect(value, index);
+                                      setChangeCat(value);
                                     }}
                                     className={clsx(
                                       el?.categoryErr && "border-red"
@@ -744,6 +775,7 @@ const GenerateBill = () => {
                                     isDisabled={el?.disableProd}
                                     onChange={(value) => {
                                       handleProductSelect(value, index);
+                                      setChangeProd(value);
                                     }}
                                     className={clsx(
                                       el?.productErr && "border-red"
@@ -768,6 +800,7 @@ const GenerateBill = () => {
                                 value={el.quantity}
                                 onChange={(e) => {
                                   handleInputChange(e, index);
+                                  setChangeQty(e.target.value);
                                 }}
                                 disabled={el?.disableQty}
                               />
@@ -786,6 +819,7 @@ const GenerateBill = () => {
                                 value={el.price}
                                 onChange={(e) => {
                                   handleInputChange(e, index);
+                                  setChangePrice(e.target.value);
                                 }}
                                 onKeyPress={(event) => {
                                   if (!/[0-9]/.test(event.key)) {
@@ -859,13 +893,7 @@ const GenerateBill = () => {
                             <div>
                               ₹
                               <span data-kt-element="sub-total">
-                                {(() => {
-                                  let total = 0;
-                                  product.forEach((el) => {
-                                    total += parseFloat(el.total);
-                                  });
-                                  return total;
-                                })()}
+                                {billDetails?.subTotal || 0}
                               </span>
                             </div>
                           </div>
@@ -1026,7 +1054,7 @@ const GenerateBill = () => {
                                   maxLength={3}
                                   onKeyPress={(event) => {
                                     const currentValue =
-                                      event.target.value + event.key; // Combine current value with pressed key
+                                      event.target.value + event.key;
                                     if (
                                       !/^\d*\.?\d*$/.test(currentValue) ||
                                       parseInt(currentValue) > 100
@@ -1061,7 +1089,7 @@ const GenerateBill = () => {
                         <th colSpan="2" className="text-end fs-4 text-nowrap">
                           ₹
                           <span data-kt-element="grand-total">
-                            {(() => {
+                            {/* {(() => {
                               let total = 0;
                               product.forEach((el) => {
                                 total += parseFloat(el.total);
@@ -1091,7 +1119,8 @@ const GenerateBill = () => {
                               }
                               console.log("============", billDetails);
                               return parseFloat(total.toFixed(2));
-                            })()}
+                            })()} */}
+                            {billDetails?.total || 0}
                           </span>
                         </th>
                       </tr>
