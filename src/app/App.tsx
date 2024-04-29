@@ -15,15 +15,14 @@ const App = () => {
           <ThemeModeProvider>
             <AuthInit>
               <ToastContainer
-                position="bottom-left"
-                autoClose={3000}
+                position="top-right"
+                autoClose={1500}
                 hideProgressBar={false}
                 newestOnTop={true}
                 closeOnClick
                 rtl={false}
                 pauseOnFocusLoss
                 draggable
-                pauseOnHover
                 theme="colored"
               />
               <Outlet />
