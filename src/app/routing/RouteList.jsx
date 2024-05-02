@@ -12,6 +12,7 @@ import Customer from "../pages/merchant/customers/Customer";
 import CustomerDetails from "../pages/merchant/customers/CustomerDetails";
 import Invoices from "../pages/merchant/invoices/Invoices";
 import Calander from "../pages/merchant/calander/Calander";
+import Analysis from "../pages/merchant/analysis/Analysis";
 const { customer, merchant, admin } = UserRoles;
 const { BEFORE_AUTH, AFTER_AUTH, DEFAULT } = LayoutTypes;
 
@@ -193,6 +194,16 @@ export const routeList = [
     path: "/merchant/calander",
     name: "Calander",
     element: <Calander />,
+    layoutType: AFTER_AUTH,
+    isAuthRequired: true,
+    accessRoles: [merchant],
+  },
+  {
+    id: "CUST_16",
+    icon: "",
+    path: "/merchant/analysis",
+    name: "Calander",
+    element: <Analysis />,
     layoutType: AFTER_AUTH,
     isAuthRequired: true,
     accessRoles: [merchant],
