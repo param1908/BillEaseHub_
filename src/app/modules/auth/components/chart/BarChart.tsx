@@ -34,7 +34,7 @@ export function BarChart() {
       },
       title: {
         display: true,
-        text: "Customer Amounts",
+        text: "Invoice Amounts",
       },
     },
   };
@@ -54,7 +54,7 @@ export function BarChart() {
     datasets: [
       {
         fill: true,
-        label: "Customer's total amount",
+        label: "Total Invoices Amount",
         data: chartData,
         borderColor: "rgb(53, 162, 235)",
         backgroundColor: "rgba(53, 162, 235, 0.5)",
@@ -71,18 +71,13 @@ export function BarChart() {
       const response = await getDashboardCustomerBillsApi();
       const resultArray: any = [];
       for (const date of allDates) {
-        const foundItem = response.data?.getBillTemplateData.find(
-          (item: { _id: string }) => item._id === date
-        );
-        if (foundItem) {
-          const totalSum = foundItem.billsData.reduce(
-            (sum: any, bill: { total: any }) => sum + Number(bill.total),
-            0
-          );
-          resultArray.push(parseFloat(totalSum.toFixed(2)));
-        } else {
-          resultArray.push(0);
-        }
+        let totalSum = 0;
+        response.data?.getBillTemplateData.forEach((el: any) => {
+          if (el.formattedDate === date) {
+            totalSum += Number(el.total);
+          }
+        });
+        resultArray.push(parseFloat(totalSum.toFixed(2)));
       }
       console.log("prepareDateArr", resultArray);
       setChartData(resultArray);

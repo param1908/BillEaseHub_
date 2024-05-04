@@ -23,28 +23,6 @@ import { DoughnutChart } from "../../../modules/auth/components/chart/DoughnutCh
 
 const DashboardPage: FC = () => (
   <>
-    {/* begin::Row */}
-    <div className="row g-5 g-xl-10 mb-5 mb-xl-10">
-      <div
-        className="col-xxl-6 d-flex justify-content-center align-items-center"
-        style={{ maxHeight: " 400px" }}
-      >
-        <DoughnutChart />
-      </div>
-      {/* begin::Col */}
-      <div className="col-xxl-6">
-        <EngageWidget10 className="h-md-100" />
-      </div>
-      {/* end::Col */}
-    </div>
-    {/* end::Row */}
-
-    <div className="row g-5 g-xl-10 mb-5 mb-xl-10">
-      <div className="col-xxl-12 d-flex justify-content-center align-items-center">
-        <BarChart />
-      </div>
-    </div>
-
     <div className="row g-5 g-xl-10 mb-5 mb-xl-10">
       {/* begin::Col */}
       <div className="col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10">

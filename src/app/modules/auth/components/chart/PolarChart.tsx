@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { Doughnut } from "react-chartjs-2";
-import { getDashboardCustomerTotalApi } from "../../../../services/merchant.service";
+import {
+  Chart as ChartJS,
+  RadialLinearScale,
+  ArcElement,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { PolarArea } from "react-chartjs-2";
 import moment from "moment";
-import MainLoader from "../../../../loaders/MainLoader";
+import { getDashboardCustomerTotalApi } from "../../../../services/merchant.service";
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+ChartJS.register(RadialLinearScale, ArcElement, Tooltip, Legend);
 
-export function DoughnutChart() {
+export function PolarChart() {
   const [chartData, setChartData] = useState([20, 20, 20, 20, 20, 20]);
   const [loading, setLoading] = useState(false);
   const currentDate = moment();
@@ -16,7 +21,6 @@ export function DoughnutChart() {
     month: currentDate.format("MMMM"),
     date: currentDate.format("YYYY-MM"),
   };
-  const [isChart, setIsChart] = useState(false);
   lastSixMonths.push(currentMonthObj);
   for (let i = 0; i < 5; i++) {
     const monthObj = {
@@ -25,30 +29,22 @@ export function DoughnutChart() {
     };
     lastSixMonths.unshift(monthObj);
   }
+  const [isChart, setIsChart] = useState(false);
   const data = {
     labels: lastSixMonths?.map(
-      (item: { month: string; date: string }) =>
-        item?.month + " (" + moment(item?.date).format("MM/YYYY") + ")"
+      (item: { month: string; date: string }) => item?.month
     ),
     datasets: [
       {
-        label: "Invoices",
+        label: "Invoice Amount",
         data: chartData,
         backgroundColor: [
-          "rgba(255, 99, 132, 0.2)",
-          "rgba(54, 162, 235, 0.2)",
-          "rgba(255, 206, 86, 0.2)",
-          "rgba(75, 192, 192, 0.2)",
-          "rgba(153, 102, 255, 0.2)",
-          "rgba(255, 159, 64, 0.2)",
-        ],
-        borderColor: [
-          "rgba(255, 99, 132, 1)",
-          "rgba(54, 162, 235, 1)",
-          "rgba(255, 206, 86, 1)",
-          "rgba(75, 192, 192, 1)",
-          "rgba(153, 102, 255, 1)",
-          "rgba(255, 159, 64, 1)",
+          "rgba(255, 99, 132, 0.5)",
+          "rgba(54, 162, 235, 0.5)",
+          "rgba(255, 206, 86, 0.5)",
+          "rgba(75, 192, 192, 0.5)",
+          "rgba(153, 102, 255, 0.5)",
+          "rgba(255, 159, 64, 0.5)",
         ],
         borderWidth: 1,
       },
@@ -93,16 +89,16 @@ export function DoughnutChart() {
       if (response?.data?.getBillTemplateData?.length > 0) {
         setIsChart(false);
         for (const date of lastSixMonths) {
-          let totalInvoice = 0;
+          let totalSum = 0;
           response.data?.getBillTemplateData.forEach((el: any) => {
             if (
               moment(el?.billDate, "DD/MM/YYYY").format("YYYY-MM") ===
               date?.date
             ) {
-              totalInvoice += 1;
+              totalSum += Number(el.total);
             }
           });
-          resultArray.push(parseFloat(totalInvoice.toFixed(2)));
+          resultArray.push(parseFloat(totalSum.toFixed(2)));
         }
       } else {
         setIsChart(true);
@@ -115,14 +111,5 @@ export function DoughnutChart() {
     }
   };
 
-  return (
-    <>
-      <Doughnut
-        data={data}
-        options={isChart ? options : options2}
-        style={{ height: "430px" }}
-      />
-      {loading && <MainLoader />}
-    </>
-  );
+  return <PolarArea data={data} options={isChart ? options : options2} />;
 }

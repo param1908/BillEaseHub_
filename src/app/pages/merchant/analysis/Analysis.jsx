@@ -2,6 +2,9 @@ import React from "react";
 import imageLight from "../../../../_metronic/assets/images/svg/analysis/2.svg";
 import imageDark from "../../../../_metronic/assets/images/svg/analysis/2-dark.svg";
 import { Chart } from "react-chartjs-2";
+import { BarChart } from "../../../modules/auth/components/chart/BarChart";
+import { DoughnutChart } from "../../../modules/auth/components/chart/DoughnutChart";
+import { PolarChart } from "../../../modules/auth/components/chart/PolarChart";
 
 const Analysis = () => {
   return (
@@ -19,12 +22,12 @@ const Analysis = () => {
                   <img
                     src={imageLight}
                     className="theme-light-show w-200px"
-                    alt=""
+                    alt="img-logo"
                   />
                   <img
                     src={imageDark}
                     className="theme-dark-show w-200px"
-                    alt=""
+                    alt="img-logo"
                   />
                 </div>
               </div>
@@ -33,19 +36,25 @@ const Analysis = () => {
         </div>
         <div className="col-xxl-8 mb-5 mb-xl-10">
           <div className="card h-md-100" dir="ltr">
-            <div className="card-body d-flex flex-column flex-center py-15 w-100"></div>
+            <div className="card-body d-flex flex-column flex-center py-15 w-100">
+              <BarChart />
+            </div>
           </div>
         </div>
       </div>
       <div className="row g-5 g-xl-10 mb-5 mb-xl-10">
         <div className="col-xxl-6 mb-5 mb-xl-10">
           <div className="card h-md-100" dir="ltr">
-            <div className="card-body d-flex flex-column flex-center py-15 px-15"></div>
+            <div className="card-body d-flex flex-column flex-center py-15 px-15">
+              <DoughnutChart />
+            </div>
           </div>
         </div>
         <div className="col-xxl-6 mb-5 mb-xl-10">
           <div className="card h-md-100" dir="ltr">
-            <div className="card-body d-flex flex-column flex-center py-15 px-15"></div>
+            <div className="card-body d-flex flex-column flex-center py-15 px-15">
+              <PolarChart />
+            </div>
           </div>
         </div>
       </div>
