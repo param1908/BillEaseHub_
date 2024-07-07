@@ -258,7 +258,7 @@ const Invoices = () => {
                               {el?.customerName}
                             </td>
                             <td role="cell" className="">
-                              {el?.customerEmail}
+                              {el?.customerEmail || "-"}
                             </td>
                             <td role="cell" className="text-capitalize">
                               {el?.phoneNumber ? "+91 " + el?.phoneNumber : "-"}

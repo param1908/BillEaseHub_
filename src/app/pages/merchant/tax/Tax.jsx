@@ -226,7 +226,7 @@ const Tax = () => {
                     setIsEdit(false);
                   }}
                 >
-                  <a className="btn btn-sm btn-light-primary py-4 cursor-pointer">
+                  <a className="btn btn-sm btn-light-primary py-4 cursor-pointer fw-bold">
                     <i className="ki-duotone ki-plus fs-3"></i>Add Tax
                   </a>
                 </div>
