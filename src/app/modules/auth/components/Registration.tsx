@@ -19,7 +19,6 @@ interface FormErrors {
   email?: string;
   phoneNumber?: string;
   location?: string;
-  companyName?: string;
   companyURL?: string;
   GSTIN?: string;
   password?: string;
@@ -36,7 +35,7 @@ export function Registration() {
     fullName: Yup.string()
       .min(2, "Minimum 2 characters")
       .max(50, "Maximum 50 characters")
-      .required("Full name is required"),
+      .required("Shop/Company name is required"),
     email: Yup.string()
       .email("Invalid email format")
       .required("Email is required"),
@@ -44,7 +43,6 @@ export function Registration() {
       .matches(/^[0-9]{10}$/, "Invalid phone number")
       .required("Phone number is required"),
     location: Yup.string(),
-    companyName: Yup.string(),
     password: Yup.string()
       .min(6, "Minimum 6 characters")
       .max(20, "Maximum 20 characters")
@@ -59,7 +57,6 @@ export function Registration() {
       return Yup.object().shape({
         ...commonSchema,
         location: Yup.string().required("Location is required"),
-        companyName: Yup.string().required("Company name is required"),
       });
     } else {
       return Yup.object().shape({
@@ -73,7 +70,6 @@ export function Registration() {
     email: "",
     phoneNumber: "",
     location: "",
-    companyName: "",
     companyURL: "",
     GSTIN: "",
     password: "",
@@ -261,12 +257,10 @@ export function Registration() {
             </div>
             {/* begin::Heading */}
 
-            {renderInput("fullName", "Name", "text")}
+            {renderInput("fullName", "Shop/Company Name", "text")}
             {renderInput("phoneNumber", "Phone", "text")}
             {accountType !== "C" && renderInput("location", "Address", "text")}
             {renderInput("email", "Email", "email")}
-            {accountType !== "C" &&
-              renderInput("companyName", "Shop/Company Name", "text")}
             {accountType !== "C" &&
               renderInput(
                 "companyURL",
