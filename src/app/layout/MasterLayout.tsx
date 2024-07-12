@@ -20,6 +20,7 @@ import clsx from "clsx";
 
 const MasterLayout = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const isToken = localStorage.getItem("_token");
   const { userDetails } = useSelector((state: UserDetails) => state?.user);
@@ -36,6 +37,7 @@ const MasterLayout = () => {
         dispatch(storeUserDetails(userDetailsResponse?.data));
       }
     } catch (error) {
+      navigate("/auth/login");
       console.log(error);
     }
   };

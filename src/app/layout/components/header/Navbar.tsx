@@ -63,7 +63,7 @@ const Navbar = () => {
                   color: "#f9f9f9",
                 }}
               >
-                {userDetails?.user?.fullName[0]}
+                {userDetails?.user?.merchantData?.companyName[0]}
               </div>
             )}
           </div>

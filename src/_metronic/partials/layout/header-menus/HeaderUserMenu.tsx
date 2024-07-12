@@ -46,13 +46,16 @@ const HeaderUserMenu: FC = () => {
                   color: "#f9f9f9",
                 }}
               >
-                {userDetails?.user?.fullName[0]}
+                {userDetails?.user?.merchantData?.companyName[0]}
               </div>
             )}
           </div>
 
           <div className="d-flex flex-column">
-            <div className="fw-bolder d-flex align-items-center fs-5 text-capitalize">
+            <div className="fw-bolder d-flex align-items-center fs-5 text-capitalize mb-1">
+              {userDetails?.user?.merchantData?.companyName}
+            </div>
+            <div className="fw-bold text-muted text-hover-primary fs-8 text-capitalize">
               {userDetails?.user?.fullName}
             </div>
             <a href="#" className="fw-bold text-muted text-hover-primary fs-7">
